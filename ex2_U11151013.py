@@ -5,8 +5,9 @@ print(f"華氏溫度為{fahrenheit_temperature:.2f} 度")  # 印出小數點後�
 
 # U11151013 賴廷榛 作業二 分組器 2025-09-16
 seat_number: int = int(input("請輸入座號："))
-group: int = (seat_number // 6) + (
-    1 if seat_number % 6 != 0 else 0)  # 如果有餘數就加一
+num_groups: int = 6
+group: int = (seat_number // num_groups) + (
+    1 if seat_number % num_groups != 0 else 0)  # 如果有餘數就加一
 print(f"您分配到第{group}組")
 
 # U11151013 賴廷榛 作業三 採購費用 2025-09-16
