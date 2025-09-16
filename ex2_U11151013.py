@@ -16,7 +16,7 @@ num_individual: int = num_drinks % 12
 total_cost: int = (num_dozens * 300) + (num_individual * 30)
 print(f"您需要買{num_dozens}打加上{num_individual}瓶飲料，總共{total_cost}元")
 
-# U11151013 賴廷榛 回文判斷 2025-09-16
+# U11151013 賴廷榛 作業四 回文判斷 2025-09-16
 text: str = input("請輸入一個字串？")
 reversed_text: str = text[::-1]
 is_palindrome: bool = text == reversed_text
