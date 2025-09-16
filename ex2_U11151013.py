@@ -26,3 +26,8 @@ print(f"迴文判斷結果為{is_palindrome}")
 email: str = input("請輸入一個e-mail？")
 domain: str = email.split('@')[-1]
 print(f"這個e-mail的網域為{domain}")
+
+# U11151013 賴廷榛 作業六 部分隱藏 2025-09-16
+name: str = input("請輸入病患姓名？")
+hidden_name: str = name[0] + '*' * (len(name) - 2) + name[-1]
+print(f"病患被公告的姓名為{hidden_name}")
