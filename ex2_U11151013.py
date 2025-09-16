@@ -21,3 +21,8 @@ text: str = input("請輸入一個字串？")
 reversed_text: str = text[::-1]
 is_palindrome: bool = text == reversed_text
 print(f"迴文判斷結果為{is_palindrome}")
+
+# U11151013 賴廷榛 作業五 網域判斷 2025-09-16
+email: str = input("請輸入一個e-mail？")
+domain: str = email.split('@')[-1]
+print(f"這個e-mail的網域為{domain}")
