@@ -8,3 +8,10 @@ seat_number: int = int(input("請輸入座號："))
 group: int = (seat_number // 6) + (
     1 if seat_number % 6 != 0 else 0)  # 如果有餘數就加一
 print(f"您分配到第{group}組")
+
+# U11151013 賴廷榛 作業三 採購費用 2025-09-16
+num_drinks: int = int(input("請輸入飲料瓶數："))
+num_dozens: int = num_drinks // 12
+num_individual: int = num_drinks % 12
+total_cost: int = (num_dozens * 300) + (num_individual * 30)
+print(f"您需要買{num_dozens}打加上{num_individual}瓶飲料，總共{total_cost}元")
