@@ -9,8 +9,7 @@ print(nums)
 # U11151013 賴廷榛 ex3 作業二 2025/09/23
 text: str = input("輸入一段文字？")
 chars: set[str] = set(text)
-for ch_to_remove in ["，", "。"]:
-    chars.remove(ch_to_remove)
+chars -= {"，", "。"}
 print(chars)
 
 # U11151013 賴廷榛 ex3 作業三 2025/09/23
