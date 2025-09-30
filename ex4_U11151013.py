@@ -61,31 +61,47 @@
 # print(f"{"宅配" if delivery_method == "1" else "i郵箱取貨"}重量{package_weight}公斤，" +
 #       (f"所需郵資為{cost}元" if cost != -1 else "超過20公斤無法寄送"))
 
-# U11151013 賴廷榛 ex4 作業五 2025/09/30
-denominations: list[int] = sorted([100, 50, 10, 5, 1], reverse=True)
-checkout_amount: int = int(input("請輸入結帳金額？"))
-pay_amount: int = int(input("請輸入顧客支付金額？"))
-if pay_amount == checkout_amount:
-    print("不需要找零")
-elif pay_amount < checkout_amount:
-    print(f"所支付的金額不夠{checkout_amount - pay_amount}元")
-else:
-    total_change: int = pay_amount - checkout_amount
-    change_str: str = f"找零{total_change}元："
-    change_per_denomination: dict[int, int] = {}
-    for denomination in denominations:
-        if total_change >= denomination:
-            num_denomination: int = total_change // denomination
-            change_per_denomination[denomination] = num_denomination
-            total_change -= denomination * num_denomination
+# # U11151013 賴廷榛 ex4 作業五 2025/09/30
+# denominations: list[int] = sorted([100, 50, 10, 5, 1], reverse=True)
+# checkout_amount: int = int(input("請輸入結帳金額？"))
+# pay_amount: int = int(input("請輸入顧客支付金額？"))
+# if pay_amount == checkout_amount:
+#     print("不需要找零")
+# elif pay_amount < checkout_amount:
+#     print(f"所支付的金額不夠{checkout_amount - pay_amount}元")
+# else:
+#     total_change: int = pay_amount - checkout_amount
+#     change_str: str = f"找零{total_change}元："
+#     change_per_denomination: dict[int, int] = {}
+#     for denomination in denominations:
+#         if total_change >= denomination:
+#             num_denomination: int = total_change // denomination
+#             change_per_denomination[denomination] = num_denomination
+#             total_change -= denomination * num_denomination
 
-    remaining_iter = len(change_per_denomination)
-    for denomination, count in change_per_denomination.items():
-        if denomination >= 100:
-            change_str += f"{count}張{denomination}元紙鈔"
-        else:
-            change_str += f"{count}個{denomination}元硬幣"
-        remaining_iter -= 1
-        if remaining_iter > 0:
-            change_str += " "
-    print(change_str)
+#     remaining_iter = len(change_per_denomination)
+#     for denomination, count in change_per_denomination.items():
+#         if denomination >= 100:
+#             change_str += f"{count}張{denomination}元紙鈔"
+#         else:
+#             change_str += f"{count}個{denomination}元硬幣"
+#         remaining_iter -= 1
+#         if remaining_iter > 0:
+#             change_str += " "
+#     print(change_str)
+
+# U11151013 賴廷榛 ex4 額外練習 2025/09/30
+triangle_sides: list[int] = list(
+    map(int, input("請輸入三角形的三個邊長，以空白分隔？").split()))
+triangle_sides.sort()
+
+triangle_type: str = "No"
+a, b, c = triangle_sides
+if a + b > c:
+    if a**2 + b**2 > c**2:
+        triangle_type = "Acute"
+    elif a**2 + b**2 == c**2:
+        triangle_type = "Right"
+    else:
+        triangle_type = "Obtuse"
+print(" ".join(map(str, triangle_sides)) + triangle_type)
