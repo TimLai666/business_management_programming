@@ -19,20 +19,44 @@
 #     is_leap = True
 # print(f"{year}是閏年" if is_leap else f"{year}是平年")
 
-# U11151013 賴廷榛 ex4 作業三 2025/09/30
-from math import isnan, nan
+# # U11151013 賴廷榛 ex4 作業三 2025/09/30
+# weight: float = float(input("請問包裹重量為多少公斤？"))
+# cost: int = -1
+# if weight <= 5:
+#     cost = 50
+# elif weight <= 10:
+#     cost = 70
+# elif weight <= 15:
+#     cost = 90
+# elif weight <= 20:
+#     cost = 110
+# print(f"重量{weight}公斤，"+(f"所需郵資為{cost}元" if cost != -1 else "超過20公斤無法寄送"))
 
+# U11151013 賴廷榛 ex4 作業四 2025/09/30
+delivery_method: str = input("請問包裹配送方式(1.宅配 2.i郵箱取貨)？")
+if not delivery_method in {"1", "2"}:
+    print("包裹配送方式必須輸入1或2！")
+    exit(1)
 
-weight: float = float(input("請問包裹重量為多少公斤？"))
-cost: float = 0.0
-if weight <= 5:
-    cost = 50
-elif weight <= 10:
-    cost = 70
-elif weight <= 15:
-    cost = 90
-elif weight <= 20:
-    cost = 110
+cost: int = -1
+package_weight: float = float(input("請問包裹重量為多少公斤？"))
+if delivery_method == "1":
+    if package_weight <= 5:
+        cost = 70
+    elif package_weight <= 10:
+        cost = 90
+    elif package_weight <= 15:
+        cost = 110
+    elif package_weight <= 20:
+        cost = 130
 else:
-    cost = nan
-print(f"重量{weight}公斤，"+(f"所需郵資為{cost}元" if not isnan(cost) else "超過20公斤無法寄送"))
+    if package_weight <= 5:
+        cost = 48
+    elif package_weight <= 10:
+        cost = 68
+    elif package_weight <= 15:
+        cost = 88
+    elif package_weight <= 20:
+        cost = 113
+print(f"{"宅配" if delivery_method == "1" else "i郵箱取貨"}重量{package_weight}公斤，" +
+      (f"所需郵資為{cost}元" if cost != -1 else "超過20公斤無法寄送"))
