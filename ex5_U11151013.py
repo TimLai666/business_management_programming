@@ -24,3 +24,12 @@ for i in range(1, 1001):
     if i % input_m == 0 or i % input_n == 0:
         num_multiples_of_m_or_n += 1
 print(f"1到1000之間是{input_m}或{input_n}的倍數的數字共有{num_multiples_of_m_or_n}個")
+
+# U11151013 賴廷榛 ex5 作業三 2025/10/07
+num_numbers_to_compare: int = int(input("請輸入要比較幾個數字？"))
+number_list: list[float] = []
+for i in range(num_numbers_to_compare):
+    number: float = float(input(f"數字{i + 1}？"))
+    number_list.append(number)
+number_list.sort(reverse=True)
+print(number_list)
