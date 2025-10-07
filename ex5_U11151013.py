@@ -37,9 +37,10 @@ print(number_list)
 # U11151013 賴廷榛 ex5 作業四 2025/10/07
 input_int: int = int(input("請輸入一個整數？"))
 factors: list[int] = [1]
-for i in range(2, input_int + 1):
+for i in range(2, input_int):
     if input_int % i == 0:
         factors.append(i)
+factors.append(input_int)
 print(f"{input_int}的因數有{len(factors)}個，分別為")
 for factor in factors:
     print(factor)
