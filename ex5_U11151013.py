@@ -1,3 +1,5 @@
+import random
+
 # U11151013 賴廷榛 ex5 作業一 2025/10/07
 input_int: int = int(input("請輸入一個整數？"))
 
@@ -52,3 +54,18 @@ sentence_list: list[str] = sentence.split()
 for word in sentence_list:
     abbreviation += word[0].upper()
 print(f"縮寫為{abbreviation}")
+
+# U11151013 賴廷榛 ex5 作業六 2025/10/07
+a: int = random.randint(1, 99)
+guess: int = -1
+count: int = 0
+while guess != a:
+    guess = int(input("請輸入1到99之間的整數？"))
+    if guess < 1 or guess > 99:
+        print("輸入錯誤，請重新輸入")
+    elif guess < a:
+        print("你猜的數字太小了！再試一次：")
+    elif guess > a:
+        print("你猜的數字太大了！再試一次：")
+    count += 1
+print(f"經過{count}次的努力，終於答對了！")
