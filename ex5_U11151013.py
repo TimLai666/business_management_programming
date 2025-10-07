@@ -44,3 +44,11 @@ factors.append(input_int)
 print(f"{input_int}的因數有{len(factors)}個，分別為")
 for factor in factors:
     print(factor)
+
+# U11151013 賴廷榛 ex5 作業五 2025/10/07
+abbreviation: str = ""
+sentence: str = input("請輸入一段話?")
+sentence_list: list[str] = sentence.split()
+for word in sentence_list:
+    abbreviation += word[0].upper()
+print(f"縮寫為{abbreviation}")
