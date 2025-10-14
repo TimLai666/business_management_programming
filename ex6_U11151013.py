@@ -45,6 +45,7 @@ print(f"{min_n}!>={input_int_m}")
 mora_dict: dict[int, str] = {0: "剪刀", 1: "石頭", 2: "布"}
 while True:
     mora_random: int = random.randint(0, 2)
+    # 海象運算子順便把輸入存到input_mora變數
     while (input_mora := int(input("請出拳：[0]剪刀[1]石頭[2]布:"))) not in mora_dict:
         print("出拳只能出0,1,2三個整數")
     if input_mora == mora_random:
