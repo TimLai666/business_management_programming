@@ -18,10 +18,8 @@ for char in input_str:
     elif char.isalpha():
         has_alpha = True
     if has_digit and has_alpha:
+        print(f"此字串{input_str}符合規定")
         break
-
-if has_digit and has_alpha:
-    print(f"此字串{input_str}符合規定")
 else:
     print("輸入的字串沒有同時包含數字與英文字")
 
