@@ -1,3 +1,5 @@
+import random
+
 # U11151013 賴廷榛 ex6 作業一 2025/10/14
 input_str: str = input("請輸入一個字串：")
 if input_str.isdigit():
@@ -38,3 +40,18 @@ for i in range(1, input_int_m + 1):
         break
 print(f"{max_n}!<{input_int_m}")
 print(f"{min_n}!>={input_int_m}")
+
+# U11151013 賴廷榛 ex6 作業四 2025/10/14
+mora_dict: dict[int, str] = {0: "剪刀", 1: "石頭", 2: "布"}
+while True:
+    mora_random: int = random.randint(0, 2)
+    while (input_mora := int(input("請出拳：[0]剪刀[1]石頭[2]布:"))) not in mora_dict:
+        print("出拳只能出0,1,2三個整數")
+    if input_mora == mora_random:
+        print(f"你出{mora_dict[input_mora]}，電腦出{mora_dict[mora_random]}，平手")
+    elif (input_mora == 0 and mora_random == 1) or (input_mora == 1 and mora_random == 2) or (input_mora == 2 and mora_random == 0):
+        print(f"你出{mora_dict[input_mora]}，電腦出{mora_dict[mora_random]}，電腦贏")
+    else:
+        print(f"你出{mora_dict[input_mora]}，電腦出{mora_dict[mora_random]}，你贏了")
+        print("遊戲結束")
+        break
