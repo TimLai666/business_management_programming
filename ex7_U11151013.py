@@ -11,9 +11,24 @@ while input("按任意鍵再按[ENTER]鍵擲骰子，直接按[ENTER]鍵可以�
 print(f"遊戲結束！總次數：{dice_count} 總點數：{dice_sum}")
 
 # U11151013 賴廷榛 ex7 作業二 2025/10/21
-lotto_numbers = random.sample(range(1, 50), 7)
-special_number = lotto_numbers[-1]
+lotto_numbers: list[int] = random.sample(range(1, 50), 7)
+special_number: int = lotto_numbers[-1]
 print(f"""本期大樂透號碼依序抽出：{lotto_numbers}
 本期大樂透中獎號碼為：{", ".join(str(n) for n in sorted(lotto_numbers[:-1]))}
 本期大樂透特別號為：{special_number}
 """)
+
+# U11151013 賴廷榛 ex7 作業三 2025/10/21
+
+
+def isprime(n: int) -> bool:
+    if n <= 1:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+
+num: int = int(input("請輸入一個整數："))
+print(f"{num}" + ("是" if isprime(num) else "不是") + "質數")
