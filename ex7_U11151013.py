@@ -34,3 +34,28 @@ def isprime(n: int) -> bool:
 
 num: int = int(input("請輸入一個整數："))
 print(f"{num}" + ("是" if isprime(num) else "不是") + "質數")
+
+
+# U11151013 賴廷榛 ex7 作業四 2025/10/21
+def prime_factors(n: int) -> list[int]:
+    factors: list[int] = []
+    if n <= 1:
+        return factors
+
+    if n % 2 == 0:
+        factors.append(2)
+
+    # 只找奇數
+    for i in range(3, n + 1, 2):
+        if n % i != 0:
+            continue
+        for j in range(2, int(i**0.5) + 1):
+            if i != j and i % j == 0:
+                break
+        else:
+            factors.append(i)
+    return factors
+
+
+n: int = int(input("請輸入一個整數："))
+print(prime_factors(n))
