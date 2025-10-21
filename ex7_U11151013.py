@@ -59,3 +59,64 @@ def prime_factors(n: int) -> list[int]:
 
 n: int = int(input("請輸入一個整數："))
 print(prime_factors(n))
+
+# U11151013 賴廷榛 ex7 作業五 2025/10/21
+
+
+def check_id(id_number: str) -> bool:
+    if len(id_number) != 10:
+        return False
+
+    if not id_number[0].isalpha() or not id_number[1:].isdigit():
+        return False
+
+    alph_dict: dict[str, int] = {
+        "A": 10,
+        "B": 11,
+        "C": 12,
+        "D": 13,
+        "E": 14,
+        "F": 15,
+        "G": 16,
+        "H": 17,
+        "I": 34,
+        "J": 18,
+        "K": 19,
+        "M": 21,
+        "N": 22,
+        "O": 35,
+        "P": 23,
+        "Q": 24,
+        "T": 27,
+        "U": 28,
+        "V": 29,
+        "W": 32,
+        "X": 30,
+        "Z": 33
+    }
+
+    if id_number[0].upper() not in alph_dict:
+        return False
+
+    if id_number[1] not in "12":
+        return False
+
+    weights: list[int] = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1]
+    total: int = alph_dict[id_number[0].upper()]//10 * weights[0]
+    total += alph_dict[id_number[0].upper()] % 10 * weights[1]
+    for char, w in zip(id_number[1:], weights[2:]):
+        total += int(char) * w
+
+    if total % 10 != 0:
+        return False
+
+    return True
+
+
+while id_number := input("輸入身分證字號(按Enter結束)："):
+    if check_id(id_number):
+        print("身分證字號正確")
+    else:
+        print("身分證字號格式錯誤")
+
+print("驗證結束！")
