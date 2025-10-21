@@ -1,0 +1,19 @@
+import random
+
+# U11151013 賴廷榛 ex7 作業一 2025/10/21
+dice_sum: int = 0
+dice_count: int = 0
+while input("按任意鍵再按[ENTER]鍵擲骰子，直接按[ENTER]鍵可以結束:"):
+    dice: int = random.randint(1, 6)
+    print(f"你擲的骰子點數為：{dice}")
+    dice_sum += dice
+    dice_count += 1
+print(f"遊戲結束！總次數：{dice_count} 總點數：{dice_sum}")
+
+# U11151013 賴廷榛 ex7 作業二 2025/10/21
+lotto_numbers = random.sample(range(1, 50), 7)
+special_number = lotto_numbers[-1]
+print(f"""本期大樂透號碼依序抽出：{lotto_numbers}
+本期大樂透中獎號碼為：{", ".join(str(n) for n in sorted(lotto_numbers[:-1]))}
+本期大樂透特別號為：{special_number}
+""")
