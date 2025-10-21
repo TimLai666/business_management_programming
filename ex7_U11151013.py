@@ -26,7 +26,9 @@ print(f"""本期大樂透號碼依序抽出：{lotto_numbers}
 def isprime(n: int) -> bool:
     if n <= 1:
         return False
-    for i in range(2, int(n**0.5) + 1):
+    if n == 2:
+        return True
+    for i in range(3, int(n**0.5) + 1, 2):
         if n % i == 0:
             return False
     return True
@@ -59,6 +61,7 @@ def prime_factors(n: int) -> list[int]:
 
 n: int = int(input("請輸入一個整數："))
 print(prime_factors(n))
+
 
 # U11151013 賴廷榛 ex7 作業五 2025/10/21
 
