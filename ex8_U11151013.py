@@ -12,6 +12,7 @@ def f(n: int) -> int:
 n: int = int(input("請輸入一個整數？"))
 print(f"1*2+2*3+...+{n-1}*{n}={f(n)}")
 
+
 # U11151013 賴廷榛 ex8 作業二 2025/10/28
 f2: Callable[[list[int]], list[int]] = lambda l: [
     e for e in l if 0 <= e <= 300]
