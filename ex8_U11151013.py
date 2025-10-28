@@ -6,4 +6,4 @@ def f(n: int) -> int:
 
 
 n: int = int(input("請輸入一個整數？"))
-print(f"1*2+2*3+...+{(n-1)}*{n}={f(n)}")
+print(f"1*2+2*3+...+{n-1}*{n}={f(n)}")
