@@ -1,4 +1,8 @@
+from typing import Callable
+
 # U11151013 賴廷榛 ex8 作業一 2025/10/28
+
+
 def f(n: int) -> int:
     if n == 0:
         return n
@@ -7,3 +11,9 @@ def f(n: int) -> int:
 
 n: int = int(input("請輸入一個整數？"))
 print(f"1*2+2*3+...+{n-1}*{n}={f(n)}")
+
+# U11151013 賴廷榛 ex8 作業二 2025/10/28
+f2: Callable[[list[int]], list[int]] = lambda l: [
+    e for e in l if 0 <= e <= 300]
+print(f2([-2, 10, 156, 320]))
+print(f2([-2, -9, 123, 16, 250, 1000]))
