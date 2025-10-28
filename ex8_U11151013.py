@@ -28,9 +28,10 @@ print(factors(34))
 
 
 # U11151013 賴廷榛 ex8 作業四 2025/10/28
-a, b = map(int, input("兩個數字，以空格隔開：").split())
-armstrong_numbers: list[int] = (lambda x, y: [i for i in range(
-    x, y+1) if i == sum(
-        digit**len(str(i)) for digit in map(int, str(i)))])(a, b)
-print(" ".join(map(str, armstrong_numbers))
-      if armstrong_numbers else "找不到阿姆斯壯數!")
+while input_nums := input("兩個數字，以空格隔開："):
+    a, b = map(int, input_nums.split())
+    armstrong_numbers: list[int] = (lambda x, y: [i for i in range(
+        x, y+1) if i == sum(
+            int(digit)**len(str(i)) for digit in str(i))])(a, b)
+    print(" ".join(map(str, armstrong_numbers))
+          if armstrong_numbers else "找不到阿姆斯壯數!")
