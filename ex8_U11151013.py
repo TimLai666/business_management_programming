@@ -18,3 +18,10 @@ f2: Callable[[list[int]], list[int]] = lambda l: [
     e for e in l if 0 <= e <= 300]
 print(f2([-2, 10, 156, 320]))
 print(f2([-2, -9, 123, 16, 250, 1000]))
+
+
+# U11151013 賴廷榛 ex8 作業三 2025/10/28
+factors: Callable[[int], list[int]] = lambda num: [
+    i for i in range(1, num+1) if num % i == 0]
+print(factors(100))
+print(factors(34))
