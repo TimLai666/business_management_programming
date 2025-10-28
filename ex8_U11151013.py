@@ -1,7 +1,7 @@
 # U11151013 賴廷榛 ex8 作業一 2025/10/28
 def f(n: int) -> int:
-    if n == 1:
-        return 0
+    if n == 0:
+        return n
     return n*(n-1)+f(n-1)
 
 
