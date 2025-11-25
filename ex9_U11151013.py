@@ -28,4 +28,15 @@ for month in range(1, 13):
     month_count.append(count)
 
 print(month_count)
+# %% U11151013 賴廷榛 ex9 作業三 2025/11/4
+
+# %% U11151013 賴廷榛 ex9 作業四 2025/11/4
+try:
+    a: int = int(input("請輸入第一個整數："))
+    b: int = int(input("請輸入第二個整數："))
+    r = a + b
+except:
+    print("發生輸入非整數的錯誤!")
+else:
+    print("總和為", r)
 # %%
