@@ -35,8 +35,24 @@ try:
     a: int = int(input("請輸入第一個整數："))
     b: int = int(input("請輸入第二個整數："))
     r = a + b
+    print("總和為", r)
 except:
     print("發生輸入非整數的錯誤!")
-else:
-    print("總和為", r)
+# %% U11151013 賴廷榛 ex9 作業五 2025/11/4
+while True:
+    try:
+        a: int = int(input("請輸入第一個整數："))
+    except:
+        print("發生輸入非整數的錯誤!")
+    else:
+        break
+while True:
+    try:
+        b: int = int(input("請輸入第二個整數："))
+    except:
+        print("發生輸入非整數的錯誤!")
+    else:
+        break
+r = a + b
+print("總和為", r)
 # %%
