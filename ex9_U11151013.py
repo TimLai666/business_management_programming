@@ -28,7 +28,27 @@ for month in range(1, 13):
     month_count.append(count)
 
 print(month_count)
+
 # %% U11151013 賴廷榛 ex9 作業三 2025/11/4
+import csv
+fields: list = []
+rows: list = []
+with open("105_traffic.csv", "r", encoding="utf-8") as csvfile:
+    csvreader = csv.reader(csvfile)
+    fields = next(csvreader)
+    for row in csvreader:
+        rows.append(row)
+print(f"共有{len(rows)}筆資料")
+print(fields)
+print("前五筆資料如下：")
+for row in rows[:5]:
+    print(row)
+print("1~12月各月份發生車禍的次數如下：")
+accidents_num: dict[str, int] = {'{:0>2d}'.format(i): 0 for i in range(1, 13)}
+for row in rows:
+    accidents_num[row[1]] += 1
+
+print(accidents_num)
 
 # %% U11151013 賴廷榛 ex9 作業四 2025/11/4
 try:
@@ -38,6 +58,7 @@ try:
     print("總和為", r)
 except:
     print("發生輸入非整數的錯誤!")
+    
 # %% U11151013 賴廷榛 ex9 作業五 2025/11/4
 while True:
     try:
@@ -55,6 +76,7 @@ while True:
         break
 r = a + b
 print("總和為", r)
+
 # %% U11151013 賴廷榛 ex9 作業六 2025/11/4
 try:
     x1: int = int(input("請輸入第一個整數："))
