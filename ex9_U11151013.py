@@ -81,13 +81,11 @@ print("總和為", r)
 try:
     x1: int = int(input("請輸入第一個整數："))
     x2: int = int(input("請輸入第二個整數："))
-except:
+    remainder: int = x1 % x2
+    print(f"{x1}除以{x2}的餘數為{remainder}")
+except ValueError:
     print("發生輸入非整數的錯誤!")
-else:
-    try:
-        remainder: int = x1 % x2
-        print(f"{x1}除以{x2}的餘數為{remainder}")
-    except:
+except ZeroDivisionError:
         print("發生 integer division or modulo by zero 的錯誤")
 finally:
     print("程式執行結束")
