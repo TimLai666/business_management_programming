@@ -41,7 +41,7 @@ import pandas as pd
 data: pd.DataFrame = pd.read_csv("109年台北市出生人數.csv", encoding="big5")
 
 data["總計"] = data.sum(axis=1, numeric_only=True)
-data["月平均"] = data["總計"] / 12
+data["月平均"] = data.iloc[:,:-1].mean(axis=1, numeric_only=True)
 print(data)
 data.to_csv("109年台北市各行政區出生總人數.csv", sep=",", index=False,encoding='big5')
 
