@@ -35,6 +35,7 @@ print()
 print("過輕者(BMI<18.5):")
 print(data[data["BMI"] < 18.5])
 print()
+
 # %% U11151013 賴廷榛 ex10 作業二 2025/12/2
 import pandas as pd
 data: pd.DataFrame = pd.read_csv("109年台北市出生人數.csv", encoding="big5")
@@ -43,4 +44,26 @@ data["總計"] = [data.iloc[i,1:13].sum() for i in range(len(data))]
 data["月平均"] = data["總計"] / 12
 print(data)
 data.to_csv("109年台北市各行政區出生總人數.csv", sep=",", index=False,encoding='big5')
+
+# %% U11151013 賴廷榛 ex10 作業三 2025/12/2
+import pandas as pd
+data: pd.DataFrame = pd.read_csv("aqx_p_02.csv", encoding="utf-8")
+print("檢查缺失值的狀況")
+print(data.isna().sum())
+print()
+
+print(f"偵測時間 {data["datacreationdate"].min()}")
+print(f"總共有 {data.shape[0]} 筆資料")
+print(f"總共有 {data.isna().any(axis=1).sum()} 筆資料不全")
+print()
+
+data.dropna(inplace=True)
+
+print(f"有 {data['site'].nunique()} 個偵測站")
+print(f"空氣品質最差的地方PM2.5值為 {data["pm25"].max()}")
+worst = data[data["pm25"] == data["pm25"].max()]
+print(f"{worst["county"].iat[0]}{worst["site"].iat[0]}")
+print(f"空氣品質最好的地方PM2.5值為 {data["pm25"].min()}")
+best = data[data["pm25"] == data["pm25"].min()]
+print(f"{best["county"].iat[0]}{best["site"].iat[0]}")
 # %%
