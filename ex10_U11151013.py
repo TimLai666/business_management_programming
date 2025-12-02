@@ -44,6 +44,10 @@ data["總計"] = data.sum(axis=1, numeric_only=True)
 data["月平均"] = data.iloc[:,:-1].mean(axis=1, numeric_only=True)
 print(data)
 data.to_csv("109年台北市各行政區出生總人數.csv", sep=",", index=False,encoding='big5')
+print()
+
+print("總人數前五名")
+print(data.sort_values(by="總計", ascending=False).head(5))
 
 # %% U11151013 賴廷榛 ex10 作業三 2025/12/2
 import pandas as pd
