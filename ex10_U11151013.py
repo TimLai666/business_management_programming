@@ -35,4 +35,12 @@ print()
 print("過輕者(BMI<18.5):")
 print(data[data["BMI"] < 18.5])
 print()
+# %% U11151013 賴廷榛 ex10 作業二 2025/12/2
+import pandas as pd
+data: pd.DataFrame = pd.read_csv("109年台北市出生人數.csv", encoding="big5")
+
+data["總計"] = [data.iloc[i,1:13].sum() for i in range(len(data))]
+data["月平均"] = data["總計"] / 12
+print(data)
+data.to_csv("109年台北市各行政區出生總人數.csv", sep=",", index=False,encoding='big5')
 # %%
