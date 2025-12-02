@@ -47,7 +47,9 @@ data.to_csv("109年台北市各行政區出生總人數.csv", sep=",", index=Fal
 print()
 
 print("總人數前五名")
-print(data.sort_values(by="總計", ascending=False).head(5))
+top5: pd.DataFrame=data.sort_values(by="總計", ascending=False).head(5)
+print(top5)
+top5.to_csv("109年台北市各行政區出生總人數前5名.csv", sep=",", index=False,encoding='big5')
 
 # %% U11151013 賴廷榛 ex10 作業三 2025/12/2
 import pandas as pd
