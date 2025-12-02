@@ -66,10 +66,12 @@ print()
 data.dropna(inplace=True)
 
 print(f"有 {data['site'].nunique()} 個偵測站")
-print(f"空氣品質最差的地方PM2.5值為 {data["pm25"].max()}")
-worst = data[data["pm25"] == data["pm25"].max()]
-print(f"{worst["county"].iat[0]}{worst["site"].iat[0]}")
-print(f"空氣品質最好的地方PM2.5值為 {data["pm25"].min()}")
-best = data[data["pm25"] == data["pm25"].min()]
-print(f"{best["county"].iat[0]}{best["site"].iat[0]}")
+max_pm25 = data["pm25"].max()
+min_pm25 = data["pm25"].min()
+pm25_max_location=[str(data.iloc[i,1])+str(data.iloc[i,0]) for i in range(len(data)) if data.iloc[i,2] == max_pm25]
+pm25_min_location=[str(data.iloc[i,1])+str(data.iloc[i,0]) for i in range(len(data)) if data.iloc[i,2] == min_pm25]
+print(f"空氣品質最差的地方PM2.5值為 {max_pm25}")
+print(f"{set(pm25_max_location)}")
+print(f"空氣品質最好的地方PM2.5值為 {min_pm25}")
+print(f"{set(pm25_min_location)}")
 # %%
