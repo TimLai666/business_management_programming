@@ -40,7 +40,7 @@ print()
 import pandas as pd
 data: pd.DataFrame = pd.read_csv("109年台北市出生人數.csv", encoding="big5")
 
-data["總計"] = [data.iloc[i,1:13].sum() for i in range(len(data))]
+data["總計"] = data.sum(axis=1, numeric_only=True)
 data["月平均"] = data["總計"] / 12
 print(data)
 data.to_csv("109年台北市各行政區出生總人數.csv", sep=",", index=False,encoding='big5')
