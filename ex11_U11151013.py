@@ -84,4 +84,30 @@ plt.ylabel('出生人口數數', fontproperties=myfont)
 plt.legend(prop=myfont)
 plt.show() # 顯示圖表
 
+# %% U11151013 賴廷榛 ex11 作業四 2025/12/9
+import requests
+from bs4 import BeautifulSoup
+
+url="https://www.twse.com.tw/rwd/zh/afterTrading/FMSRFK?date=20210101&stockNo=2330&response=html"
+content = requests.get(url, verify=False).text
+sp = BeautifulSoup(content, "html.parser")
+datas = sp.select("table")[0]
+title=datas.find("div").text.replace(" ","") #網頁標題中空格換成空字串，用來當圖表標題
+rows = datas.select("tbody tr")
+
+months: list[int] = []
+high: list[float] = []
+low: list[float] = []
+for row in rows:
+    cols = row.select("td")
+    months.append(int(cols[1].text)) #月份
+    high.append(float(cols[2].text)) #最高價
+    low.append(float(cols[3].text)) #最低價
+plt.plot(months, high, linewidth=2.0,label="最高價")
+plt.plot(months, low, linewidth=2.0,label="最低價")
+plt.legend()
+plt.title(title) #圖表標題
+plt.xlabel("月份")
+plt.ylabel("金額")
+plt.show()
 # %%
