@@ -53,4 +53,4 @@ plt.xticks(rotation=45)
 plt.show()
 #旋轉X軸標籤方向
 
-# %%
+# %% U11151013 賴廷榛 ex11 作業三 2025/12/9
