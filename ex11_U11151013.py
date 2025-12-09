@@ -54,3 +54,34 @@ plt.show()
 #旋轉X軸標籤方向
 
 # %% U11151013 賴廷榛 ex11 作業三 2025/12/9
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.font_manager import FontProperties
+#將字型檔設定字型
+myfont = FontProperties(fname=r'NotoSansCJK-Regular.ttc')
+# 讀入資料集檔案
+df = pd.read_csv('109年台北市出生人數.csv',encoding='big5')
+#建立繪圖所需資料
+labels = list(df['行政區'])
+data_1 = list(df["一月"])
+data_2 = list(df["七月"])
+
+#設定繪圖參數
+width = 0.4 # the width of the bars
+x = np.arange(len(labels)) # the label locations np.arange(len(labels))產生一個數列 0,1,2,....len(labels)-1
+plt.bar([i-0.5*width for i in x], data_1, width=width, label='一月', color='skyblue') #一月、七月資料併排
+plt.bar([i+0.5*width for i in x], data_2, width=width, label='七月', color='orange')
+plt.xticks([i for i in x], labels, rotation=45, fontproperties=myfont)
+
+# 設定標頭和字體
+plt.title('109年1月與7月台北市各行政區出生人口數',fontproperties=myfont)
+# 設定 x 軸標頭和字體
+plt.xlabel('行政區',fontproperties=myfont)
+# 設定 y 軸標頭和字體
+plt.ylabel('出生人口數數', fontproperties=myfont)
+# 設定右上角說明圖示字體
+plt.legend(prop=myfont)
+plt.show() # 顯示圖表
+
+# %%
