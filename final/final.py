@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import matplotlib
@@ -41,6 +42,8 @@ print(f"""臺北市中等學校畢業生出路(全)
 income_data: pd.DataFrame = pd.read_csv(
     "臺北市所得收入者每人所得－行業別按年別.csv",
     encoding="big5")
+income_data.replace("-", np.nan, inplace=True)
+income_data.dropna(subset=["[三]可支配所得[NT]"], inplace=True)
 print(f"""臺北市所得收入者每人所得－行業別按年別
 {income_data.head()}
 """)
@@ -68,5 +71,35 @@ plt.xticks(range(min(academic_years), max(academic_years)+1, 2),
            rotation=45)
 plt.ylabel("百分比(%)")
 plt.title("臺北市高中職畢業生出路趨勢圖")
+plt.legend()
+plt.show()
+
+# 圖二：勞動力（參與率、就業率、失業率）變動圖
+time_periods: pd.Series = labor_force_data["統計期"]
+labor_participation_rate: pd.Series = labor_force_data["勞動力參與率[%]"]
+unemployment_rate: pd.Series = labor_force_data["失業率[%]"]
+plt.figure(figsize=(12, 6))
+plt.plot(time_periods, labor_participation_rate, label="勞動參與率", marker='o')
+plt.plot(time_periods, unemployment_rate, label="失業率", marker='^')
+plt.xlabel("統計期")
+plt.xticks(rotation=45)
+plt.ylabel("百分比(%)")
+plt.title("臺北市勞動力變動圖")
+plt.legend()
+plt.show()
+
+# 圖三：全產業可支配所得變化趨勢圖
+time_periods: pd.Series = income_data["年別"]
+industry: pd.Series = income_data["行業"]
+disposable_income: pd.Series = income_data["[三]可支配所得[NT]"].apply(pd.to_numeric)
+plt.figure(figsize=(12, 6))
+for ind in industry.unique():
+    ind_data = income_data[income_data["行業"] == ind]
+    plt.plot(ind_data["年別"], ind_data["[三]可支配所得[NT]"], label=ind, marker='o')
+plt.xlabel("年別")
+plt.xticks(rotation=45)
+plt.ylabel("可支配所得 (NT)")
+# plt.yticks(range(int(disposable_income.min()), int(disposable_income.max())))
+plt.title("臺北市全產業可支配所得變化趨勢圖")
 plt.legend()
 plt.show()
