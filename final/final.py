@@ -94,24 +94,29 @@ plt.show()
 
 # 圖二：勞動力（參與率、就業率、失業率）變動圖
 time_periods: pd.Series = labor_force_data["統計期"]
-labor_participation_rate: pd.Series = labor_force_data["勞動力參與率[%]"]
-unemployment_rate: pd.Series = labor_force_data["失業率[%]"]
+labor_participation_rate: pd.Series = labor_force_data["勞動力參與率[%]"].astype(float)
+unemployment_rate: pd.Series = labor_force_data["失業率[%]"].astype(float)
+labor_force: pd.Series = labor_force_data["勞動力人口/合計[千人]"].astype(float)
+total_employed_population: pd.Series = labor_force_data["勞動力人口/就業者[千人]"].astype(float)
+employment_rate: pd.Series = (
+    total_employed_population / labor_force * 100
+)
 plt.figure(figsize=(14, 6))
 plt.suptitle("臺北市勞動力變動圖", fontsize=14, y=0.98)
 
-plt.subplot(1, 2, 1)
-plt.plot(time_periods, labor_participation_rate, label="勞動參與率", marker="o")
+plt.subplot(2, 2, 1)
+plt.plot(time_periods, labor_participation_rate, label="勞動參與率", marker="o", color="blue")
 plt.ylabel("百分比(%)")
 plt.xlabel("統計期")
-plt.ylim(50, 60)  # 設定Y軸範圍更貼近數據
+plt.ylim(54, 60)  # 設定Y軸範圍更貼近數據
 # 只顯示部分X軸標籤，避免重疊
 x_ticks = range(0, len(time_periods), max(1, len(time_periods) // 10))
 plt.xticks(x_ticks, [time_periods.iloc[i] for i in x_ticks], rotation=45, ha="right")
 plt.legend()
 plt.grid(True, alpha=0.3)
 
-plt.subplot(1, 2, 2)
-plt.plot(time_periods, unemployment_rate, label="失業率", marker="^")
+plt.subplot(2, 2, 2)
+plt.plot(time_periods, unemployment_rate, label="失業率", marker="^", color="red")
 plt.ylabel("百分比(%)")
 plt.xlabel("統計期")
 plt.ylim(3, 6.5)  # 設定Y軸範圍更貼近數據
@@ -119,6 +124,15 @@ plt.ylim(3, 6.5)  # 設定Y軸範圍更貼近數據
 plt.xticks(x_ticks, [time_periods.iloc[i] for i in x_ticks], rotation=45, ha="right")
 plt.legend()
 plt.grid(True, alpha=0.3)
+
+plt.subplot(2, 1, 2)
+plt.plot(time_periods, employment_rate, label="就業率", marker="s", color="green")
+plt.ylabel("百分比(%)")
+plt.xlabel("統計期")
+plt.ylim(93, 98)  # 設定Y軸範
+# 只顯示部分X軸標籤，避免重疊
+plt.xticks(x_ticks, [time_periods.iloc[i] for i in x_ticks], rotation=45, ha="right")
+plt.legend()
 
 plt.tight_layout()
 plt.show()
