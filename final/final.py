@@ -1,6 +1,7 @@
 import matplotlib
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 import numpy as np
 import pandas as pd
 
@@ -96,7 +97,7 @@ graduates_data, income_data, labor_force_data = prepare_data()
 
 
 # 圖一：畢業生出路（升學 vs 就業 vs 其他）長期趨勢圖
-def plot_graduates_trends(graduates_data: pd.DataFrame) -> None:
+def plot1_graduates_trends(graduates_data: pd.DataFrame) -> None:
     """繪製畢業生出路趨勢圖"""
     academic_years: pd.Series = graduates_data["學年度"]
     total_graduates: pd.Series = graduates_data["總計[人]"]
@@ -120,10 +121,10 @@ def plot_graduates_trends(graduates_data: pd.DataFrame) -> None:
     plt.legend()
     plt.show()
 
-plot_graduates_trends(graduates_data)
+plot1_graduates_trends(graduates_data)
 
 # 圖二：勞動力（參與率、就業率、失業率）變動圖
-def plot_labor_force_trends(labor_force_data: pd.DataFrame) -> None:
+def plot2_labor_force_trends(labor_force_data: pd.DataFrame) -> None:
     """繪製勞動力變動圖"""
     time_periods: pd.Series = labor_force_data["統計期"]
     labor_participation_rate: pd.Series = labor_force_data["勞動力參與率[%]"].astype(float)
@@ -172,22 +173,22 @@ def plot_labor_force_trends(labor_force_data: pd.DataFrame) -> None:
     plt.tight_layout()
     plt.show()
 
-plot_labor_force_trends(labor_force_data)
+plot2_labor_force_trends(labor_force_data)
 
 
 # 圖三：全產業受僱人員報酬變化趨勢圖
-def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
+def plot3_industry_income_trends(income_data: pd.DataFrame) -> None:
     """繪製全產業受僱人員報酬變化趨勢圖"""
     # thousands_formatter: Callable = lambda x, pos: (x / 1000)
 
     # 為避免 x（年別）與 y（產業資料列數）長度不一致，改用每個產業對應的年別作為 x
     # 擷取數字型的年（例如：'98年' -> 98, '100年' -> 100）以便排序與設定 xticks
     income_data["year"] = (
-        income_data["年別"].astype(str).str.extract(r"(\d+)")[0].astype(int)
+        income_data["年別"].astype(str).str[:-1].astype(int)
     )
 
     plt.figure(figsize=(14, 7))
-    ax = plt.gca()
+    # ax = plt.gca()
 
     # 以 1.受僱人員報酬[NT] 做為 y 軸
     all_years: list = sorted(income_data["year"].unique())
@@ -197,39 +198,42 @@ def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
         ind_data: pd.DataFrame = income_data[income_data["行業"] == ind].copy()
         ind_data.sort_values("year", inplace=True)
 
-        y = pd.to_numeric(ind_data["1.受僱人員報酬[NT]"], errors="coerce")
-        x = ind_data["year"]
+        y: pd.Series = pd.to_numeric(ind_data["1.受僱人員報酬[NT]"], errors="coerce")
+        x: pd.Series = ind_data["year"]
 
         # 若某產業全為缺值則跳過
-        valid_mask = ~y.isna()
+        valid_mask: pd.Series[bool] = ~y.isna()
         if valid_mask.sum() == 0:
             continue
 
-        # debug: 如果是農林相關產業，印出該產業在各年的數值
-        if "農林" in ind:
-            print(f"產業: {ind}，年份: {list(x[valid_mask])}，受僱人員報酬: {list(y[valid_mask])}")
+        # 轉換成千元以符合 Y 軸標籤 (千元)，避免 matplotlib 自動使用科學記號
+        y_k = y / 1000.0
 
-        ax.plot(
+        plt.plot(
             x[valid_mask],
-            y[valid_mask],
+            y_k[valid_mask],
             label=ind,
             marker=markers[idx % len(markers)],
             markersize=4,
             linewidth=1.5,
         )
 
-    ax.set_xlabel("民國年", fontsize=12)
-    ax.set_ylabel("受僱人員報酬 (千元)", fontsize=12)
-    ax.set_title("臺北市全產業受僱人員報酬變化趨勢圖", fontsize=14, pad=15)
+    plt.xlabel("民國年", fontsize=12)
+    plt.ylabel("受僱人員報酬 (千元)", fontsize=12)
+    plt.title("臺北市全產業受僱人員報酬變化趨勢圖", fontsize=14, pad=15)
 
     # 用整理過的數字年作為 xticks
-    ax.set_xticks(all_years)
-    ax.set_xticklabels(all_years, rotation=45, ha="right")
+    plt.xticks(all_years, rotation=45, ha="right")
 
-    # ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # 設定 Y 軸顯示格式：千位分隔並關閉 offset（例如 1e6）顯示
+    ax = plt.gca()
+    # ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
+    # 若 matplotlib 產生 offset（像 '×1e6'），把它隱藏以避免誤解
+    if hasattr(ax.yaxis, "offsetText"):
+        ax.yaxis.offsetText.set_visible(False)
 
     # 調整圖例：放在圖表外右側
-    ax.legend(
+    plt.legend(
         bbox_to_anchor=(1.02, 1),
         loc="upper left",
         fontsize=9,
@@ -237,16 +241,16 @@ def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
         frameon=True,
         shadow=True,
     )
-    ax.grid(True, alpha=0.3, linestyle="--")
+    plt.grid(True, alpha=0.3, linestyle="--")
 
     # 調整子圖位置，給Y軸標籤和圖例留出更多空間
     plt.subplots_adjust(left=0.08, right=0.8, top=0.85, bottom=0.1)
     plt.show()
 
-plot_industry_income_trends(income_data)
+plot3_industry_income_trends(income_data)
 
 # # 圖四：產業別所得差距（長條圖）
-def plot_income_gap_by_industry(income_data: pd.DataFrame) -> None:
+def plot4_income_gap_by_industry(income_data: pd.DataFrame) -> None:
     """繪製產業別所得差距長條圖"""
     
     # 取最新年度資料
@@ -271,11 +275,11 @@ def plot_income_gap_by_industry(income_data: pd.DataFrame) -> None:
     plt.tight_layout()
     plt.show()
 
-plot_income_gap_by_industry(income_data)
+plot4_income_gap_by_industry(income_data)
 
 # 圖五：青年就業比例 vs 整體失業率
 # 雙軸折線圖（使用年平均失業率，與高中職畢業生就業比例比較）
-def plot_graduates_employment_vs_unemployment(graduates_data, labor_force_data: pd.DataFrame) -> None:
+def plot5_graduates_employment_vs_unemployment(graduates_data, labor_force_data: pd.DataFrame) -> None:
     """繪製青年就業比例 vs 整體失業率雙軸圖"""
     
     total_graduates: pd.Series = graduates_data["總計[人]"]
@@ -290,7 +294,6 @@ def plot_graduates_employment_vs_unemployment(graduates_data, labor_force_data: 
         labor_force_data_year.groupby("year")["失業率[%]"].apply(lambda s: s.astype(float).mean()).reset_index()
     )
     # 畢業生就業比例（對應學年度）
-    # todo: 學年度使與年度的合併這樣好嗎？
     graduates_pct_df = pd.DataFrame({"year": graduates_data["學年度"], "graduates_employment_pct": graduates_employment_percentage.values})
     # 合併資料（只保留雙方皆有的年份）
     merged = pd.merge(unemployment_yearly, graduates_pct_df, on="year", how="inner").sort_values("year")
@@ -320,7 +323,9 @@ def plot_graduates_employment_vs_unemployment(graduates_data, labor_force_data: 
     plt.tight_layout()
     plt.show()
 
-plot_graduates_employment_vs_unemployment(
+plot5_graduates_employment_vs_unemployment(
     graduates_data, 
     labor_force_data
 )
+
+# 圖六：升學比例 vs 平均所得
