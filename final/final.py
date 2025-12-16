@@ -88,27 +88,31 @@ labor_force_data: pd.DataFrame = data_dict["labor_force_data"]
 
 
 # 圖一：畢業生出路（升學 vs 就業 vs 其他）長期趨勢圖
-academic_years: pd.Series = graduates_data["學年度"]
-total_graduates: pd.Series = graduates_data["總計[人]"]
-further_education: pd.Series = (
-    graduates_data["升學/合計[人]"] / total_graduates * 100
-)
-graduates_employment_percentage: pd.Series = graduates_data["就業/合計[人]"] / total_graduates * 100
-others: pd.Series = (
-    (graduates_data["其他[人]"] + graduates_data["閒居[人]"])
-    / total_graduates
-    * 100
-)
-plt.figure(figsize=(12, 6))
-plt.plot(academic_years, further_education, label="升學", marker="o")
-plt.plot(academic_years, graduates_employment_percentage, label="就業", marker="^")
-plt.plot(academic_years, others, label="其他", marker="s")
-plt.xlabel("學年度")
-plt.xticks(range(min(academic_years), max(academic_years) + 1, 2), rotation=45)
-plt.ylabel("百分比(%)")
-plt.title("臺北市高中職畢業生出路趨勢圖")
-plt.legend()
-plt.show()
+def plot_graduates_trends() -> None:
+    """繪製畢業生出路趨勢圖"""
+    academic_years: pd.Series = graduates_data["學年度"]
+    total_graduates: pd.Series = graduates_data["總計[人]"]
+    further_education: pd.Series = (
+        graduates_data["升學/合計[人]"] / total_graduates * 100
+    )
+    graduates_employment_percentage: pd.Series = graduates_data["就業/合計[人]"] / total_graduates * 100
+    others: pd.Series = (
+        (graduates_data["其他[人]"] + graduates_data["閒居[人]"])
+        / total_graduates
+        * 100
+    )
+    plt.figure(figsize=(12, 6))
+    plt.plot(academic_years, further_education, label="升學", marker="o")
+    plt.plot(academic_years, graduates_employment_percentage, label="就業", marker="^")
+    plt.plot(academic_years, others, label="其他", marker="s")
+    plt.xlabel("學年度")
+    plt.xticks(range(min(academic_years), max(academic_years) + 1, 2), rotation=45)
+    plt.ylabel("百分比(%)")
+    plt.title("臺北市高中職畢業生出路趨勢圖")
+    plt.legend()
+    plt.show()
+
+plot_graduates_trends()
 
 # 圖二：勞動力（參與率、就業率、失業率）變動圖
 time_periods: pd.Series = labor_force_data["統計期"]
