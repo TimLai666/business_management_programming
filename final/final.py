@@ -8,7 +8,7 @@ from matplotlib.ticker import FuncFormatter
 fm.fontManager.addfont("TaipeiSansTCBeta-Regular.ttf")
 matplotlib.rc("font", family="Taipei Sans TC Beta")
 
-def prepare_data() -> dict[str, pd.DataFrame]:
+def prepare_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """準備並清理資料"""
       
     # 讀取中學畢業生出路資料
@@ -73,17 +73,11 @@ def prepare_data() -> dict[str, pd.DataFrame]:
     """)
 
 
-    return {
-        "graduates_data": graduates_data_full,
-        "income_data": income_data,
-        "labor_force_data": labor_force_data,
-    }
+    return graduates_data_full, income_data, labor_force_data
 
 
-data_dict: dict[str, pd.DataFrame] = prepare_data()
-graduates_data: pd.DataFrame = data_dict["graduates_data"]
-income_data: pd.DataFrame = data_dict["income_data"]
-labor_force_data: pd.DataFrame = data_dict["labor_force_data"]
+
+graduates_data, income_data, labor_force_data = prepare_data()
 
 
 
@@ -115,95 +109,105 @@ def plot_graduates_trends() -> None:
 plot_graduates_trends()
 
 # 圖二：勞動力（參與率、就業率、失業率）變動圖
-time_periods: pd.Series = labor_force_data["統計期"]
-labor_participation_rate: pd.Series = labor_force_data["勞動力參與率[%]"].astype(float)
-unemployment_rate: pd.Series = labor_force_data["失業率[%]"].astype(float)
-labor_force: pd.Series = labor_force_data["勞動力人口/合計[千人]"].astype(float)
-total_employed_population: pd.Series = labor_force_data["勞動力人口/就業者[千人]"].astype(float)
-employment_rate: pd.Series = (
-    total_employed_population / labor_force * 100
-)
-plt.figure(figsize=(14, 6))
-plt.suptitle("臺北市勞動力變動圖", fontsize=14, y=0.98)
+def plot_labor_force_trends() -> None:
+    """繪製勞動力變動圖"""
+    time_periods: pd.Series = labor_force_data["統計期"]
+    labor_participation_rate: pd.Series = labor_force_data["勞動力參與率[%]"].astype(float)
+    unemployment_rate: pd.Series = labor_force_data["失業率[%]"].astype(float)
+    labor_force: pd.Series = labor_force_data["勞動力人口/合計[千人]"].astype(float)
+    total_employed_population: pd.Series = labor_force_data["勞動力人口/就業者[千人]"].astype(float)
+    employment_rate: pd.Series = (
+        total_employed_population / labor_force * 100
+    )
+    plt.figure(figsize=(14, 6))
+    plt.suptitle("臺北市勞動力變動圖", fontsize=14, y=0.98)
 
-plt.subplot(2, 2, 1)
-plt.plot(time_periods, labor_participation_rate, label="勞動參與率", marker="o", color="blue")
-plt.ylabel("百分比(%)")
-plt.xlabel("統計期")
-plt.ylim(54, 60)  # 設定Y軸範圍更貼近數據
-# 只顯示部分X軸標籤，避免重疊
-x_ticks = range(0, len(time_periods), max(1, len(time_periods) // 10))
-plt.xticks(x_ticks, [time_periods.iloc[i] for i in x_ticks], rotation=45, ha="right")
-plt.legend()
-plt.grid(True, alpha=0.3)
+    # 勞動參與率
+    plt.subplot(2, 2, 1)
+    plt.plot(time_periods, labor_participation_rate, label="勞動參與率", marker="o", color="blue")
+    plt.ylabel("百分比(%)")
+    plt.xlabel("統計期")
+    plt.ylim(54, 60)  # 設定Y軸範圍更貼近數據
+    # 只顯示部分X軸標籤，避免重疊
+    x_ticks = range(0, len(time_periods), max(1, len(time_periods) // 10))
+    plt.xticks(x_ticks, [time_periods.iloc[i] for i in x_ticks], rotation=45, ha="right")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
 
-plt.subplot(2, 2, 2)
-plt.plot(time_periods, unemployment_rate, label="失業率", marker="^", color="red")
-plt.ylabel("百分比(%)")
-plt.xlabel("統計期")
-plt.ylim(3, 6.5)  # 設定Y軸範圍更貼近數據
-# 只顯示部分X軸標籤，避免重疊
-plt.xticks(x_ticks, [time_periods.iloc[i] for i in x_ticks], rotation=45, ha="right")
-plt.legend()
-plt.grid(True, alpha=0.3)
+    # 失業率
+    plt.subplot(2, 2, 2)
+    plt.plot(time_periods, unemployment_rate, label="失業率", marker="^", color="red")
+    plt.ylabel("百分比(%)")
+    plt.xlabel("統計期")
+    plt.ylim(3, 6.5)  # 設定Y軸範圍更貼近數據
+    # 只顯示部分X軸標籤，避免重疊
+    plt.xticks(x_ticks, [time_periods.iloc[i] for i in x_ticks], rotation=45, ha="right")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
 
-plt.subplot(2, 1, 2)
-plt.plot(time_periods, employment_rate, label="就業率", marker="s", color="green")
-plt.ylabel("百分比(%)")
-plt.xlabel("統計期")
-plt.ylim(93, 98)  # 設定Y軸範
-# 只顯示部分X軸標籤，避免重疊
-plt.xticks(x_ticks, [time_periods.iloc[i] for i in x_ticks], rotation=45, ha="right")
-plt.legend()
+    # 就業率
+    plt.subplot(2, 1, 2)
+    plt.plot(time_periods, employment_rate, label="就業率", marker="s", color="green")
+    plt.ylabel("百分比(%)")
+    plt.xlabel("統計期")
+    plt.ylim(93, 98)  # 設定Y軸範
+    # 只顯示部分X軸標籤，避免重疊
+    plt.xticks(x_ticks, [time_periods.iloc[i] for i in x_ticks], rotation=45, ha="right")
+    plt.legend()
 
-plt.tight_layout()
-plt.show()
+    plt.tight_layout()
+    plt.show()
+
+plot_labor_force_trends()
 
 
 # 圖三：全產業可支配所得變化趨勢圖
-# FIXME
-def thousands_formatter(x, pos):
-    """將數值格式化為千元單位"""
-    return f"{int(x / 1000)}"
+def plot_industry_income_trends() -> None:
+    """繪製全產業可支配所得變化趨勢圖"""
+    # FIXME
+    def thousands_formatter(x, pos):
+        """將數值格式化為千元單位"""
+        return f"{int(x / 1000)}"
 
 
-time_periods: pd.Series = income_data["年別"]
-industry: pd.Series = income_data["行業"]
-disposable_income: pd.Series = income_data["[三]可支配所得[NT]"].apply(pd.to_numeric)
+    time_periods: pd.Series = income_data["年別"]
+    industry: pd.Series = income_data["行業"]
+    disposable_income: pd.Series = income_data["[三]可支配所得[NT]"].apply(pd.to_numeric)
 
-fig, ax = plt.subplots(figsize=(16, 8))
-for ind in industry.unique():
-    ind_data = income_data[income_data["行業"] == ind]
-    ax.plot(
-        ind_data["年別"],
-        ind_data["[三]可支配所得[NT]"],
-        label=ind,
-        marker="o",
-        markersize=4,
-        linewidth=1.5,
+    fig, ax = plt.subplots(figsize=(16, 8))
+    for ind in industry.unique():
+        ind_data = income_data[income_data["行業"] == ind]
+        ax.plot(
+            ind_data["年別"],
+            ind_data["[三]可支配所得[NT]"],
+            label=ind,
+            marker="o",
+            markersize=4,
+            linewidth=1.5,
+        )
+
+    ax.set_xlabel("年別", fontsize=12)
+    ax.set_ylabel("可支配所得 (千元)", fontsize=12)
+    ax.set_title("臺北市全產業可支配所得變化趨勢圖", fontsize=14, pad=15)
+    plt.xticks(rotation=45, ha="right")
+    ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+
+    # 調整圖例：放在圖表外右側
+    ax.legend(
+        bbox_to_anchor=(1.02, 1),
+        loc="upper left",
+        fontsize=9,
+        ncol=1,
+        frameon=True,
+        shadow=True,
     )
+    ax.grid(True, alpha=0.3, linestyle="--")
 
-ax.set_xlabel("年別", fontsize=12)
-ax.set_ylabel("可支配所得 (千元)", fontsize=12)
-ax.set_title("臺北市全產業可支配所得變化趨勢圖", fontsize=14, pad=15)
-plt.xticks(rotation=45, ha="right")
-ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # 調整子圖位置，給Y軸標籤和圖例留出更多空間
+    plt.subplots_adjust(left=0.08, right=0.85, top=0.95, bottom=0.1)
+    plt.show()
 
-# 調整圖例：放在圖表外右側
-ax.legend(
-    bbox_to_anchor=(1.02, 1),
-    loc="upper left",
-    fontsize=9,
-    ncol=1,
-    frameon=True,
-    shadow=True,
-)
-ax.grid(True, alpha=0.3, linestyle="--")
-
-# 調整子圖位置，給Y軸標籤和圖例留出更多空間
-plt.subplots_adjust(left=0.08, right=0.85, top=0.95, bottom=0.1)
-plt.show()
-
+plot_industry_income_trends()
 
 # # 圖四：產業別所得差距（箱型圖或長條圖）
 # # FIXME
@@ -272,37 +276,46 @@ plt.show()
 
 # 圖五：青年就業比例 vs 整體失業率
 # 雙軸折線圖（使用年平均失業率，與高中職畢業生就業比例比較）
-plt.figure(figsize=(14, 6))
-# 計算年（數字）欄位方便合併
-labor_force_data_year = labor_force_data.copy()
-labor_force_data_year["year"] = labor_force_data_year["統計期"].str.extract(r"(\d{2,3})").astype(int)
-# 年平均失業率
-unemployment_yearly = (
-    labor_force_data_year.groupby("year")["失業率[%]"].apply(lambda s: s.astype(float).mean()).reset_index()
-)
-# 畢業生就業比例（對應學年度）
-graduates_pct_df = pd.DataFrame({"year": graduates_data["學年度"], "graduates_employment_pct": graduates_employment_percentage.values})
-# 合併資料（只保留雙方皆有的年份）
-merged = pd.merge(unemployment_yearly, graduates_pct_df, on="year", how="inner").sort_values("year")
-# 畫雙軸圖
-ax1 = plt.gca()
-ax1.plot(merged["year"], merged["失業率[%]"], label="整體失業率（年平均）", marker="o", color="red")
-ax1.set_xlabel("年")
-ax1.set_ylabel("失業率 (%)", color="red")
-ax1.set_ylim(merged["失業率[%]"].min() - 0.5, merged["失業率[%]"].max() + 0.5)
-ax1.tick_params(axis="y", labelcolor="red")
-ax1.set_xticks(merged["year"])
-ax1.set_xticklabels(merged["year"].astype(int), rotation=45, ha="right")
-ax1.grid(True, alpha=0.3)
-ax2 = ax1.twinx()
-ax2.plot(merged["year"], merged["graduates_employment_pct"], label="高中職畢業生就業比例", marker="s", color="blue")
-ax2.set_ylabel("畢業生就業比例 (%)", color="blue")
-ax2.set_ylim(max(0, merged["graduates_employment_pct"].min() - 5), min(100, merged["graduates_employment_pct"].max() + 5))
-ax2.tick_params(axis="y", labelcolor="blue")
-# 合併圖例
-lines1, labels1 = ax1.get_legend_handles_labels()
-lines2, labels2 = ax2.get_legend_handles_labels()
-ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper left")
-plt.title("高中職畢業生就業比例 vs 整體失業率（年平均）")
-plt.tight_layout()
-plt.show()
+def plot_graduates_employment_vs_unemployment() -> None:
+    """繪製青年就業比例 vs 整體失業率雙軸圖"""
+    
+    total_graduates: pd.Series = graduates_data["總計[人]"]
+    graduates_employment_percentage: pd.Series = graduates_data["就業/合計[人]"] / total_graduates * 100
+    
+    plt.figure(figsize=(14, 6))
+    # 計算年（數字）欄位方便合併
+    labor_force_data_year = labor_force_data.copy()
+    labor_force_data_year["year"] = labor_force_data_year["統計期"].str.extract(r"(\d{2,3})").astype(int)
+    # 年平均失業率
+    unemployment_yearly = (
+        labor_force_data_year.groupby("year")["失業率[%]"].apply(lambda s: s.astype(float).mean()).reset_index()
+    )
+    # 畢業生就業比例（對應學年度）
+    # todo: 學年度使與年度的合併這樣好嗎？
+    graduates_pct_df = pd.DataFrame({"year": graduates_data["學年度"], "graduates_employment_pct": graduates_employment_percentage.values})
+    # 合併資料（只保留雙方皆有的年份）
+    merged = pd.merge(unemployment_yearly, graduates_pct_df, on="year", how="inner").sort_values("year")
+    # 畫雙軸圖
+    ax1 = plt.gca()
+    ax1.plot(merged["year"], merged["失業率[%]"], label="整體失業率（年平均）", marker="o", color="red")
+    ax1.set_xlabel("年")
+    ax1.set_ylabel("失業率 (%)", color="red")
+    ax1.set_ylim(merged["失業率[%]"].min() - 0.5, merged["失業率[%]"].max() + 0.5)
+    ax1.tick_params(axis="y", labelcolor="red")
+    ax1.set_xticks(merged["year"])
+    ax1.set_xticklabels(labels=merged["year"].astype(int), rotation=45, ha="right")
+    ax1.grid(True, alpha=0.3)
+    ax2 = ax1.twinx()
+    ax2.plot(merged["year"], merged["graduates_employment_pct"], label="高中職畢業生就業比例", marker="s", color="blue")
+    ax2.set_ylabel("畢業生就業比例 (%)", color="blue")
+    ax2.set_ylim(max(0, merged["graduates_employment_pct"].min() - 5), min(100, merged["graduates_employment_pct"].max() + 5))
+    ax2.tick_params(axis="y", labelcolor="blue")
+    # 合併圖例
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper left")
+    plt.title("高中職畢業生就業比例 vs 整體失業率（年平均）")
+    plt.tight_layout()
+    plt.show()
+
+plot_graduates_employment_vs_unemployment()
