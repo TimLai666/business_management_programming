@@ -304,7 +304,7 @@ def plot_graduates_employment_vs_unemployment() -> None:
     ax1.set_ylim(merged["失業率[%]"].min() - 0.5, merged["失業率[%]"].max() + 0.5)
     ax1.tick_params(axis="y", labelcolor="red")
     ax1.set_xticks(merged["year"])
-    ax1.set_xticklabels(labels=merged["year"].astype(int), rotation=45, ha="right")
+    ax1.set_xticklabels(labels=merged["year"], rotation=45, ha="right")
     ax1.grid(True, alpha=0.3)
     
     ax2 = ax1.twinx()
