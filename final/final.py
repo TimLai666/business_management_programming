@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.ticker import FuncFormatter
+from typing import Callable
 
 fm.fontManager.addfont("TaipeiSansTCBeta-Regular.ttf")
 matplotlib.rc("font", family="Taipei Sans TC Beta")
@@ -60,6 +61,10 @@ def prepare_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     )
     income_data.replace("-", np.nan, inplace=True)
     income_data.dropna(subset=["[三]可支配所得[NT]"], inplace=True)
+    income_data["1.受僱人員報酬[NT]"] = pd.to_numeric(
+        income_data["1.受僱人員報酬[NT]"], errors="coerce"
+    )
+    income_data["行業"] = income_data["行業"].str.strip()
     print(f"""臺北市所得收入者每人所得－行業別按年別
     {income_data.head()}
     """)
@@ -161,12 +166,10 @@ def plot_labor_force_trends(labor_force_data: pd.DataFrame) -> None:
 plot_labor_force_trends(labor_force_data)
 
 
-# 圖三：全產業可支配所得變化趨勢圖
+# 圖三：全產業受僱人員報酬變化趨勢圖
 def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
-    """繪製全產業可支配所得變化趨勢圖（修正 x/y 維度不一致問題）"""
-    def thousands_formatter(x, pos):
-        """將數值格式化為千元單位"""
-        return f"{int(x / 1000)}"
+    """繪製全產業受僱人員報酬變化趨勢圖"""
+    # thousands_formatter: Callable = lambda x, pos: (x / 1000)
 
     # 為避免 x（年別）與 y（產業資料列數）長度不一致，改用每個產業對應的年別作為 x
     # 擷取數字型的年（例如：'98年' -> 98, '100年' -> 100）以便排序與設定 xticks
@@ -178,13 +181,14 @@ def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
     ax = plt.gca()
 
     # 以 1.受僱人員報酬[NT] 做為 y 軸
-    all_years = sorted(income_data["year"].unique())
+    all_years: list = sorted(income_data["year"].unique())
 
-    for ind in income_data["行業"].unique():
-        ind_data = income_data[income_data["行業"] == ind].copy()
+    markers: list[str] = ["o", "^", "s", "D", "v", "*", "X", "<", ">"]
+    for idx, ind in enumerate(income_data["行業"].unique()):
+        ind_data: pd.DataFrame = income_data[income_data["行業"] == ind].copy()
         ind_data.sort_values("year", inplace=True)
 
-        y = pd.to_numeric(ind_data.get("1.受僱人員報酬[NT]"), errors="coerce")
+        y = pd.to_numeric(ind_data["1.受僱人員報酬[NT]"], errors="coerce")
         x = ind_data["year"]
 
         # 若某產業全為缺值則跳過
@@ -196,12 +200,12 @@ def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
             x[valid_mask],
             y[valid_mask],
             label=ind,
-            marker="o",
+            marker=markers[idx % len(markers)],
             markersize=4,
             linewidth=1.5,
         )
 
-    ax.set_xlabel("年別", fontsize=12)
+    ax.set_xlabel("民國年", fontsize=12)
     ax.set_ylabel("受僱人員報酬 (千元)", fontsize=12)
     ax.set_title("臺北市全產業受僱人員報酬變化趨勢圖", fontsize=14, pad=15)
 
@@ -209,7 +213,7 @@ def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
     ax.set_xticks(all_years)
     ax.set_xticklabels(all_years, rotation=45, ha="right")
 
-    ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
     # 調整圖例：放在圖表外右側
     ax.legend(
@@ -223,75 +227,34 @@ def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
     ax.grid(True, alpha=0.3, linestyle="--")
 
     # 調整子圖位置，給Y軸標籤和圖例留出更多空間
-    plt.subplots_adjust(left=0.08, right=0.85, top=0.95, bottom=0.1)
+    plt.subplots_adjust(left=0.08, right=0.8, top=0.85, bottom=0.1)
     plt.show()
 
 plot_industry_income_trends(income_data)
 
-# # 圖四：產業別所得差距（箱型圖或長條圖）
-# # FIXME
-# # ---
-# # 產業別可支配所得差距分析：
-# # 1) 箱型圖 (各產業跨年度分布)
-# # 2) 長條圖 (比較最早、中間、最近三個年度的產業薪資)
+# # 圖四：產業別所得差距（長條圖）
+def plot_income_gap_by_industry(income_data: pd.DataFrame) -> None:
+    """繪製產業別所得差距長條圖"""
+    
+    # 取最新年度資料
+    latest_year: int = income_data["year"].max()
+    latest_data: pd.DataFrame = income_data[income_data["year"] == latest_year]
 
-# # 清理資料並轉成數值
-# plot_income_df = income_data.copy()
-# plot_income_df["年別"] = plot_income_df["年別"].astype(str)
-# plot_income_df["[三]可支配所得[NT]"] = pd.to_numeric(
-#     plot_income_df["[三]可支配所得[NT]"], errors="coerce"
-# )
-# plot_income_df.dropna(subset=["[三]可支配所得[NT]"], inplace=True)
+    plt.figure(figsize=(12, 6))
+    plt.bar(
+        latest_data["行業"],
+        latest_data["1.受僱人員報酬[NT]"] / 1000,  # 轉換為千元
+        color="skyblue",
+    )
+    plt.xlabel("行業", fontsize=12)
+    plt.ylabel("受僱人員報酬 (千元)", fontsize=12)
+    plt.title(f"臺北市各行業所得差距（{latest_year}年）", fontsize=14)
+    plt.xticks(rotation=45, ha="right")
+    plt.grid(axis="y", alpha=0.3)
+    plt.tight_layout()
+    plt.show()
 
-# # 選擇前 N 個平均可支配所得最高的產業，避免圖形過於擁擠
-# top_n = 8
-# industry_means = (
-#     plot_income_df.groupby("行業")["[三]可支配所得[NT]"].mean().sort_values(ascending=False)
-# )
-# top_industries = industry_means.head(top_n).index.tolist()
-# print(f"選取前 {top_n} 名產業進行繪圖：{top_industries}")
-
-# # 箱型圖：每個產業跨年度的分布（反映產業內的年度差異）
-# plt.figure(figsize=(12, 6))
-# boxplot_data = [
-#     plot_income_df[plot_income_df["行業"] == ind]["[三]可支配所得[NT]"].values
-#     for ind in top_industries
-# ]
-# plt.boxplot(boxplot_data, labels=top_industries, showmeans=True)
-# plt.ylabel("可支配所得 (千元)")
-# plt.title(f"箱型圖：前 {top_n} 行業可支配所得分布（跨年度）")
-# plt.xticks(rotation=45, ha="right")
-# ax = plt.gca()
-# ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
-# plt.tight_layout()
-# plt.show()
-
-# # 長條圖：選三個代表性年度（最早、中位、最近）進行橫向年度比較
-# years_sorted = sorted(plot_income_df["年別"].unique(), key=lambda x: int(x))
-# selected_years = [years_sorted[0], years_sorted[len(years_sorted) // 2], years_sorted[-1]]
-# print(f"選取年度進行比較：{selected_years}")
-
-# bar_df = plot_income_df[
-#     (plot_income_df["行業"].isin(top_industries)) & (plot_income_df["年別"].isin(selected_years))
-# ]
-# pivot = bar_df.pivot_table(
-#     index="行業", columns="年別", values="[三]可支配所得[NT]"
-# )
-# # 確保順序固定為 top_industries
-# pivot = pivot.reindex(top_industries)
-
-# pivot.plot(kind="bar", figsize=(14, 7))
-# plt.ylabel("可支配所得 (千元)")
-# plt.title("比較：不同年度（最早、中位、最近）各產業可支配所得")
-# plt.xticks(rotation=45, ha="right")
-# ax = plt.gca()
-# ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
-# plt.legend(title="年別")
-# plt.tight_layout()
-# plt.show()
-
-# # 額外提示：若希望比較所有年度或指定其他產業，可調整 top_n 或 selected_years 參數。
-
+plot_income_gap_by_industry(income_data)
 
 # 圖五：青年就業比例 vs 整體失業率
 # 雙軸折線圖（使用年平均失業率，與高中職畢業生就業比例比較）
