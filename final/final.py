@@ -75,7 +75,7 @@ total_graduates: pd.Series = graduates_data_full["總計[人]"]
 further_education: pd.Series = (
     graduates_data_full["升學/合計[人]"] / total_graduates * 100
 )
-employment: pd.Series = graduates_data_full["就業/合計[人]"] / total_graduates * 100
+graduates_employment_percentage: pd.Series = graduates_data_full["就業/合計[人]"] / total_graduates * 100
 others: pd.Series = (
     (graduates_data_full["其他[人]"] + graduates_data_full["閒居[人]"])
     / total_graduates
@@ -83,7 +83,7 @@ others: pd.Series = (
 )
 plt.figure(figsize=(12, 6))
 plt.plot(academic_years, further_education, label="升學", marker="o")
-plt.plot(academic_years, employment, label="就業", marker="^")
+plt.plot(academic_years, graduates_employment_percentage, label="就業", marker="^")
 plt.plot(academic_years, others, label="其他", marker="s")
 plt.xlabel("學年度")
 plt.xticks(range(min(academic_years), max(academic_years) + 1, 2), rotation=45)
@@ -139,6 +139,7 @@ plt.show()
 
 
 # 圖三：全產業可支配所得變化趨勢圖
+# FIXME
 def thousands_formatter(x, pos):
     """將數值格式化為千元單位"""
     return f"{int(x / 1000)}"
@@ -179,4 +180,107 @@ ax.grid(True, alpha=0.3, linestyle="--")
 
 # 調整子圖位置，給Y軸標籤和圖例留出更多空間
 plt.subplots_adjust(left=0.08, right=0.85, top=0.95, bottom=0.1)
+plt.show()
+
+
+# # 圖四：產業別所得差距（箱型圖或長條圖）
+# # FIXME
+# # ---
+# # 產業別可支配所得差距分析：
+# # 1) 箱型圖 (各產業跨年度分布)
+# # 2) 長條圖 (比較最早、中間、最近三個年度的產業薪資)
+
+# # 清理資料並轉成數值
+# plot_income_df = income_data.copy()
+# plot_income_df["年別"] = plot_income_df["年別"].astype(str)
+# plot_income_df["[三]可支配所得[NT]"] = pd.to_numeric(
+#     plot_income_df["[三]可支配所得[NT]"], errors="coerce"
+# )
+# plot_income_df.dropna(subset=["[三]可支配所得[NT]"], inplace=True)
+
+# # 選擇前 N 個平均可支配所得最高的產業，避免圖形過於擁擠
+# top_n = 8
+# industry_means = (
+#     plot_income_df.groupby("行業")["[三]可支配所得[NT]"].mean().sort_values(ascending=False)
+# )
+# top_industries = industry_means.head(top_n).index.tolist()
+# print(f"選取前 {top_n} 名產業進行繪圖：{top_industries}")
+
+# # 箱型圖：每個產業跨年度的分布（反映產業內的年度差異）
+# plt.figure(figsize=(12, 6))
+# boxplot_data = [
+#     plot_income_df[plot_income_df["行業"] == ind]["[三]可支配所得[NT]"].values
+#     for ind in top_industries
+# ]
+# plt.boxplot(boxplot_data, labels=top_industries, showmeans=True)
+# plt.ylabel("可支配所得 (千元)")
+# plt.title(f"箱型圖：前 {top_n} 行業可支配所得分布（跨年度）")
+# plt.xticks(rotation=45, ha="right")
+# ax = plt.gca()
+# ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+# plt.tight_layout()
+# plt.show()
+
+# # 長條圖：選三個代表性年度（最早、中位、最近）進行橫向年度比較
+# years_sorted = sorted(plot_income_df["年別"].unique(), key=lambda x: int(x))
+# selected_years = [years_sorted[0], years_sorted[len(years_sorted) // 2], years_sorted[-1]]
+# print(f"選取年度進行比較：{selected_years}")
+
+# bar_df = plot_income_df[
+#     (plot_income_df["行業"].isin(top_industries)) & (plot_income_df["年別"].isin(selected_years))
+# ]
+# pivot = bar_df.pivot_table(
+#     index="行業", columns="年別", values="[三]可支配所得[NT]"
+# )
+# # 確保順序固定為 top_industries
+# pivot = pivot.reindex(top_industries)
+
+# pivot.plot(kind="bar", figsize=(14, 7))
+# plt.ylabel("可支配所得 (千元)")
+# plt.title("比較：不同年度（最早、中位、最近）各產業可支配所得")
+# plt.xticks(rotation=45, ha="right")
+# ax = plt.gca()
+# ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+# plt.legend(title="年別")
+# plt.tight_layout()
+# plt.show()
+
+# # 額外提示：若希望比較所有年度或指定其他產業，可調整 top_n 或 selected_years 參數。
+
+
+# 圖五：青年就業比例 vs 整體失業率
+# 雙軸折線圖（使用年平均失業率，與高中職畢業生就業比例比較）
+plt.figure(figsize=(14, 6))
+# 計算年（數字）欄位方便合併
+labor_force_data_year = labor_force_data.copy()
+labor_force_data_year["year"] = labor_force_data_year["統計期"].str.extract(r"(\d{2,3})").astype(int)
+# 年平均失業率
+unemployment_yearly = (
+    labor_force_data_year.groupby("year")["失業率[%]"].apply(lambda s: s.astype(float).mean()).reset_index()
+)
+# 畢業生就業比例（對應學年度）
+graduates_pct_df = pd.DataFrame({"year": graduates_data_full["學年度"], "graduates_employment_pct": graduates_employment_percentage.values})
+# 合併資料（只保留雙方皆有的年份）
+merged = pd.merge(unemployment_yearly, graduates_pct_df, on="year", how="inner").sort_values("year")
+# 畫雙軸圖
+ax1 = plt.gca()
+ax1.plot(merged["year"], merged["失業率[%]"], label="整體失業率（年平均）", marker="o", color="red")
+ax1.set_xlabel("年")
+ax1.set_ylabel("失業率 (%)", color="red")
+ax1.set_ylim(merged["失業率[%]"].min() - 0.5, merged["失業率[%]"].max() + 0.5)
+ax1.tick_params(axis="y", labelcolor="red")
+ax1.set_xticks(merged["year"])
+ax1.set_xticklabels(merged["year"].astype(int), rotation=45, ha="right")
+ax1.grid(True, alpha=0.3)
+ax2 = ax1.twinx()
+ax2.plot(merged["year"], merged["graduates_employment_pct"], label="高中職畢業生就業比例", marker="s", color="blue")
+ax2.set_ylabel("畢業生就業比例 (%)", color="blue")
+ax2.set_ylim(max(0, merged["graduates_employment_pct"].min() - 5), min(100, merged["graduates_employment_pct"].max() + 5))
+ax2.tick_params(axis="y", labelcolor="blue")
+# 合併圖例
+lines1, labels1 = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper left")
+plt.title("高中職畢業生就業比例 vs 整體失業率（年平均）")
+plt.tight_layout()
 plt.show()
