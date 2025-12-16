@@ -179,7 +179,6 @@ plot2_labor_force_trends(labor_force_data)
 # 圖三：全產業受僱人員報酬變化趨勢圖
 def plot3_industry_income_trends(income_data: pd.DataFrame) -> None:
     """繪製全產業受僱人員報酬變化趨勢圖"""
-    # thousands_formatter: Callable = lambda x, pos: (x / 1000)
 
     # 為避免 x（年別）與 y（產業資料列數）長度不一致，改用每個產業對應的年別作為 x
     # 擷取數字型的年（例如：'98年' -> 98, '100年' -> 100）以便排序與設定 xticks
@@ -188,7 +187,6 @@ def plot3_industry_income_trends(income_data: pd.DataFrame) -> None:
     )
 
     plt.figure(figsize=(14, 7))
-    # ax = plt.gca()
 
     # 以 1.受僱人員報酬[NT] 做為 y 軸
     all_years: list = sorted(income_data["year"].unique())
@@ -206,8 +204,8 @@ def plot3_industry_income_trends(income_data: pd.DataFrame) -> None:
         if valid_mask.sum() == 0:
             continue
 
-        # 轉換成千元以符合 Y 軸標籤 (千元)，避免 matplotlib 自動使用科學記號
-        y_k = y / 1000.0
+        # 轉換成千元以符合 Y 軸標籤 (千元)
+        y_k: pd.Series = y / 1000.0
 
         plt.plot(
             x[valid_mask],
@@ -224,13 +222,6 @@ def plot3_industry_income_trends(income_data: pd.DataFrame) -> None:
 
     # 用整理過的數字年作為 xticks
     plt.xticks(all_years, rotation=45, ha="right")
-
-    # 設定 Y 軸顯示格式：千位分隔並關閉 offset（例如 1e6）顯示
-    ax = plt.gca()
-    # ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
-    # 若 matplotlib 產生 offset（像 '×1e6'），把它隱藏以避免誤解
-    if hasattr(ax.yaxis, "offsetText"):
-        ax.yaxis.offsetText.set_visible(False)
 
     # 調整圖例：放在圖表外右側
     plt.legend(
