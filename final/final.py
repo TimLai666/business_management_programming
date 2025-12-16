@@ -295,6 +295,7 @@ def plot_graduates_employment_vs_unemployment() -> None:
     graduates_pct_df = pd.DataFrame({"year": graduates_data["學年度"], "graduates_employment_pct": graduates_employment_percentage.values})
     # 合併資料（只保留雙方皆有的年份）
     merged = pd.merge(unemployment_yearly, graduates_pct_df, on="year", how="inner").sort_values("year")
+    
     # 畫雙軸圖
     ax1 = plt.gca()
     ax1.plot(merged["year"], merged["失業率[%]"], label="整體失業率（年平均）", marker="o", color="red")
@@ -305,11 +306,13 @@ def plot_graduates_employment_vs_unemployment() -> None:
     ax1.set_xticks(merged["year"])
     ax1.set_xticklabels(labels=merged["year"].astype(int), rotation=45, ha="right")
     ax1.grid(True, alpha=0.3)
+    
     ax2 = ax1.twinx()
     ax2.plot(merged["year"], merged["graduates_employment_pct"], label="高中職畢業生就業比例", marker="s", color="blue")
     ax2.set_ylabel("畢業生就業比例 (%)", color="blue")
     ax2.set_ylim(max(0, merged["graduates_employment_pct"].min() - 5), min(100, merged["graduates_employment_pct"].max() + 5))
     ax2.tick_params(axis="y", labelcolor="blue")
+    
     # 合併圖例
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
