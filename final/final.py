@@ -3,8 +3,6 @@ import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.ticker import FuncFormatter
-from typing import Callable
 
 fm.fontManager.addfont("TaipeiSansTCBeta-Regular.ttf")
 matplotlib.rc("font", family="Taipei Sans TC Beta")
@@ -61,10 +59,21 @@ def prepare_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     )
     income_data.replace("-", np.nan, inplace=True)
     income_data.dropna(subset=["[三]可支配所得[NT]"], inplace=True)
+    # 清理 1.受僱人員報酬[NT]：去掉千位分隔符或其他非數字字元，再轉為數值
+    income_data["1.受僱人員報酬[NT]"] = (
+        income_data["1.受僱人員報酬[NT]"].astype(str).str.replace(r"[^\d\.\-]", "", regex=True)
+    )
     income_data["1.受僱人員報酬[NT]"] = pd.to_numeric(
         income_data["1.受僱人員報酬[NT]"], errors="coerce"
-    )
+    ).astype(float)
     income_data["行業"] = income_data["行業"].str.strip()
+    # 檢查 113 年農林漁牧業是否正確載入與轉換
+    mask_af = (
+        income_data["年別"].astype(str).str.contains("113")
+        & income_data["行業"].str.contains("農林", na=False)
+    )
+    if mask_af.any():
+        print("113 年農林漁牧業資料（年別, 行業, 1.受僱人員報酬[NT]）:\n", income_data.loc[mask_af, ["年別","行業","1.受僱人員報酬[NT]"]])
     print(f"""臺北市所得收入者每人所得－行業別按年別
     {income_data.head()}
     """)
@@ -174,7 +183,7 @@ def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
     # 為避免 x（年別）與 y（產業資料列數）長度不一致，改用每個產業對應的年別作為 x
     # 擷取數字型的年（例如：'98年' -> 98, '100年' -> 100）以便排序與設定 xticks
     income_data["year"] = (
-        income_data["年別"].astype(str).str.extract(r"(\d{2,3})")[0].astype(int)
+        income_data["年別"].astype(str).str.extract(r"(\d+)")[0].astype(int)
     )
 
     plt.figure(figsize=(14, 7))
@@ -195,6 +204,10 @@ def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
         valid_mask = ~y.isna()
         if valid_mask.sum() == 0:
             continue
+
+        # debug: 如果是農林相關產業，印出該產業在各年的數值
+        if "農林" in ind:
+            print(f"產業: {ind}，年份: {list(x[valid_mask])}，受僱人員報酬: {list(y[valid_mask])}")
 
         ax.plot(
             x[valid_mask],
@@ -239,11 +252,15 @@ def plot_income_gap_by_industry(income_data: pd.DataFrame) -> None:
     # 取最新年度資料
     latest_year: int = income_data["year"].max()
     latest_data: pd.DataFrame = income_data[income_data["year"] == latest_year]
+    # 移除受僱人員報酬缺值，避免繪圖時出現高度為 0 的長條
+    latest_data = latest_data.dropna(subset=["1.受僱人員報酬[NT]"])
+    latest_data = latest_data.copy()
+    lastest_income_k: pd.Series = latest_data["1.受僱人員報酬[NT]"] / 1000
 
     plt.figure(figsize=(12, 6))
     plt.bar(
         latest_data["行業"],
-        latest_data["1.受僱人員報酬[NT]"] / 1000,  # 轉換為千元
+        lastest_income_k,
         color="skyblue",
     )
     plt.xlabel("行業", fontsize=12)
@@ -267,7 +284,7 @@ def plot_graduates_employment_vs_unemployment(graduates_data, labor_force_data: 
     plt.figure(figsize=(14, 6))
     # 計算年（數字）欄位方便合併
     labor_force_data_year = labor_force_data.copy()
-    labor_force_data_year["year"] = labor_force_data_year["統計期"].str.extract(r"(\d{2,3})").astype(int)
+    labor_force_data_year["year"] = labor_force_data_year["統計期"].str.extract(r"(\d+)")[0].astype(int)
     # 年平均失業率
     unemployment_yearly = (
         labor_force_data_year.groupby("year")["失業率[%]"].apply(lambda s: s.astype(float).mean()).reset_index()
