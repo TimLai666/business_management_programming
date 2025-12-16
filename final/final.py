@@ -8,76 +8,94 @@ from matplotlib.ticker import FuncFormatter
 fm.fontManager.addfont("TaipeiSansTCBeta-Regular.ttf")
 matplotlib.rc("font", family="Taipei Sans TC Beta")
 
-# 讀取中學畢業生出路資料
-graduates_data_1: pd.DataFrame = pd.read_csv(
-    "臺北市中等學校畢業生出路(57學年度至102學年度)時間數列統計資料.csv",
-    encoding="utf-8",
-)
-print(f"""臺北市中等學校畢業生出路(57學年度至102學年度)
-{graduates_data_1.head()}
-""")
+def prepare_data() -> dict[str, pd.DataFrame]:
+    """準備並清理資料"""
+      
+    # 讀取中學畢業生出路資料
+    graduates_data_1: pd.DataFrame = pd.read_csv(
+        "臺北市中等學校畢業生出路(57學年度至102學年度)時間數列統計資料.csv",
+        encoding="utf-8",
+    )
+    print(f"""臺北市中等學校畢業生出路(57學年度至102學年度)
+    {graduates_data_1.head()}
+    """)
 
-graduates_data_2: pd.DataFrame = pd.read_csv(
-    "臺北市中等學校畢業生出路(103學年度以後).csv",
-    encoding="utf-8",
-)
-print(f"""臺北市中等學校畢業生出路(103學年度以後)
-{graduates_data_2.head()}
-""")
+    graduates_data_2: pd.DataFrame = pd.read_csv(
+        "臺北市中等學校畢業生出路(103學年度以後).csv",
+        encoding="utf-8",
+    )
+    print(f"""臺北市中等學校畢業生出路(103學年度以後)
+    {graduates_data_2.head()}
+    """)
 
-graduates_data_1_only_senior_high: pd.DataFrame = graduates_data_1[
-    (graduates_data_1["學制別"] == "高中(職)")
-    | (graduates_data_1["學制別"] == "高級中學")
-    | (graduates_data_1["學制別"] == "高級職業學校")
-]
-graduates_data_1_only_senior_high.drop(columns=["學制別"], inplace=True)
-graduates_data_1_only_senior_high = (
-    graduates_data_1_only_senior_high.groupby("統計期")
-    .sum(numeric_only=True)
-    .reset_index()
-)
-print(f"""臺北市中等學校畢業生出路(57學年度至102學年度) - 只含高中職
-{graduates_data_1_only_senior_high}
-""")
+    graduates_data_1_only_senior_high: pd.DataFrame = graduates_data_1[
+        (graduates_data_1["學制別"] == "高中(職)")
+        | (graduates_data_1["學制別"] == "高級中學")
+        | (graduates_data_1["學制別"] == "高級職業學校")
+    ]
+    graduates_data_1_only_senior_high.drop(columns=["學制別"], inplace=True)
+    graduates_data_1_only_senior_high = (
+        graduates_data_1_only_senior_high.groupby("統計期")
+        .sum(numeric_only=True)
+        .reset_index()
+    )
+    print(f"""臺北市中等學校畢業生出路(57學年度至102學年度) - 只含高中職
+    {graduates_data_1_only_senior_high}
+    """)
 
-graduates_data_full: pd.DataFrame = pd.concat(
-    [graduates_data_1_only_senior_high, graduates_data_2]
-)
-graduates_data_full["學年度"] = graduates_data_full["統計期"].apply(
-    lambda x: int(x.replace("學年", ""))
-)
-graduates_data_full.sort_values(by="學年度", inplace=True)
-print(f"""臺北市中等學校畢業生出路(全)
-{graduates_data_full}
-""")
+    graduates_data_full: pd.DataFrame = pd.concat(
+        [graduates_data_1_only_senior_high, graduates_data_2]
+    )
+    graduates_data_full["學年度"] = graduates_data_full["統計期"].apply(
+        lambda x: int(x.replace("學年", ""))
+    )
+    graduates_data_full.sort_values(by="學年度", inplace=True)
+    print(f"""臺北市中等學校畢業生出路(全)
+    {graduates_data_full}
+    """)
+    
+    # 讀取每人所得資料
+    income_data: pd.DataFrame = pd.read_csv(
+        "臺北市所得收入者每人所得－行業別按年別.csv", encoding="big5"
+    )
+    income_data.replace("-", np.nan, inplace=True)
+    income_data.dropna(subset=["[三]可支配所得[NT]"], inplace=True)
+    print(f"""臺北市所得收入者每人所得－行業別按年別
+    {income_data.head()}
+    """)
+    
+    # 讀取勞動力資料
+    labor_force_data: pd.DataFrame = pd.read_csv(
+        "臺北市勞動力及就業按半年別時間數列統計資料.csv", encoding="utf-8"
+    )
+    print(f"""臺北市勞動力及就業按半年別時間數列統計資料
+    {labor_force_data.head()}
+    """)
 
-# 讀取每人所得資料
-income_data: pd.DataFrame = pd.read_csv(
-    "臺北市所得收入者每人所得－行業別按年別.csv", encoding="big5"
-)
-income_data.replace("-", np.nan, inplace=True)
-income_data.dropna(subset=["[三]可支配所得[NT]"], inplace=True)
-print(f"""臺北市所得收入者每人所得－行業別按年別
-{income_data.head()}
-""")
 
-# 讀取勞動力資料
-labor_force_data: pd.DataFrame = pd.read_csv(
-    "臺北市勞動力及就業按半年別時間數列統計資料.csv", encoding="utf-8"
-)
-print(f"""臺北市勞動力及就業按半年別時間數列統計資料
-{labor_force_data.head()}
-""")
+    return {
+        "graduates_data": graduates_data_full,
+        "income_data": income_data,
+        "labor_force_data": labor_force_data,
+    }
+
+
+data_dict: dict[str, pd.DataFrame] = prepare_data()
+graduates_data: pd.DataFrame = data_dict["graduates_data"]
+income_data: pd.DataFrame = data_dict["income_data"]
+labor_force_data: pd.DataFrame = data_dict["labor_force_data"]
+
+
 
 # 圖一：畢業生出路（升學 vs 就業 vs 其他）長期趨勢圖
-academic_years: pd.Series = graduates_data_full["學年度"]
-total_graduates: pd.Series = graduates_data_full["總計[人]"]
+academic_years: pd.Series = graduates_data["學年度"]
+total_graduates: pd.Series = graduates_data["總計[人]"]
 further_education: pd.Series = (
-    graduates_data_full["升學/合計[人]"] / total_graduates * 100
+    graduates_data["升學/合計[人]"] / total_graduates * 100
 )
-graduates_employment_percentage: pd.Series = graduates_data_full["就業/合計[人]"] / total_graduates * 100
+graduates_employment_percentage: pd.Series = graduates_data["就業/合計[人]"] / total_graduates * 100
 others: pd.Series = (
-    (graduates_data_full["其他[人]"] + graduates_data_full["閒居[人]"])
+    (graduates_data["其他[人]"] + graduates_data["閒居[人]"])
     / total_graduates
     * 100
 )
@@ -259,7 +277,7 @@ unemployment_yearly = (
     labor_force_data_year.groupby("year")["失業率[%]"].apply(lambda s: s.astype(float).mean()).reset_index()
 )
 # 畢業生就業比例（對應學年度）
-graduates_pct_df = pd.DataFrame({"year": graduates_data_full["學年度"], "graduates_employment_pct": graduates_employment_percentage.values})
+graduates_pct_df = pd.DataFrame({"year": graduates_data["學年度"], "graduates_employment_pct": graduates_employment_percentage.values})
 # 合併資料（只保留雙方皆有的年份）
 merged = pd.merge(unemployment_yearly, graduates_pct_df, on="year", how="inner").sort_values("year")
 # 畫雙軸圖
