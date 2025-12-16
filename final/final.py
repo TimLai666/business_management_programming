@@ -163,23 +163,38 @@ plot_labor_force_trends(labor_force_data)
 
 # 圖三：全產業可支配所得變化趨勢圖
 def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
-    """繪製全產業可支配所得變化趨勢圖"""
-    # FIXME
+    """繪製全產業可支配所得變化趨勢圖（修正 x/y 維度不一致問題）"""
     def thousands_formatter(x, pos):
         """將數值格式化為千元單位"""
         return f"{int(x / 1000)}"
 
+    # 為避免 x（年別）與 y（產業資料列數）長度不一致，改用每個產業對應的年別作為 x
+    # 擷取數字型的年（例如：'98年' -> 98, '100年' -> 100）以便排序與設定 xticks
+    income_data["year"] = (
+        income_data["年別"].astype(str).str.extract(r"(\d{2,3})")[0].astype(int)
+    )
 
-    time_periods: pd.Series = income_data["年別"]
-    industry: pd.Series = income_data["行業"]
-    disposable_income: pd.Series = income_data["[三]可支配所得[NT]"].apply(pd.to_numeric)
+    plt.figure(figsize=(14, 7))
+    ax = plt.gca()
 
-    fig, ax = plt.subplots(figsize=(16, 8))
-    for ind in industry.unique():
-        ind_data = income_data[income_data["行業"] == ind]
+    # 以 1.受僱人員報酬[NT] 做為 y 軸
+    all_years = sorted(income_data["year"].unique())
+
+    for ind in income_data["行業"].unique():
+        ind_data = income_data[income_data["行業"] == ind].copy()
+        ind_data.sort_values("year", inplace=True)
+
+        y = pd.to_numeric(ind_data.get("1.受僱人員報酬[NT]"), errors="coerce")
+        x = ind_data["year"]
+
+        # 若某產業全為缺值則跳過
+        valid_mask = ~y.isna()
+        if valid_mask.sum() == 0:
+            continue
+
         ax.plot(
-            ind_data["年別"],
-            ind_data["[三]可支配所得[NT]"],
+            x[valid_mask],
+            y[valid_mask],
             label=ind,
             marker="o",
             markersize=4,
@@ -187,9 +202,13 @@ def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
         )
 
     ax.set_xlabel("年別", fontsize=12)
-    ax.set_ylabel("可支配所得 (千元)", fontsize=12)
-    ax.set_title("臺北市全產業可支配所得變化趨勢圖", fontsize=14, pad=15)
-    plt.xticks(rotation=45, ha="right")
+    ax.set_ylabel("受僱人員報酬 (千元)", fontsize=12)
+    ax.set_title("臺北市全產業受僱人員報酬變化趨勢圖", fontsize=14, pad=15)
+
+    # 用整理過的數字年作為 xticks
+    ax.set_xticks(all_years)
+    ax.set_xticklabels(all_years, rotation=45, ha="right")
+
     ax.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
     # 調整圖例：放在圖表外右側
