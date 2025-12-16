@@ -82,7 +82,7 @@ graduates_data, income_data, labor_force_data = prepare_data()
 
 
 # 圖一：畢業生出路（升學 vs 就業 vs 其他）長期趨勢圖
-def plot_graduates_trends() -> None:
+def plot_graduates_trends(graduates_data: pd.DataFrame) -> None:
     """繪製畢業生出路趨勢圖"""
     academic_years: pd.Series = graduates_data["學年度"]
     total_graduates: pd.Series = graduates_data["總計[人]"]
@@ -106,10 +106,10 @@ def plot_graduates_trends() -> None:
     plt.legend()
     plt.show()
 
-plot_graduates_trends()
+plot_graduates_trends(graduates_data)
 
 # 圖二：勞動力（參與率、就業率、失業率）變動圖
-def plot_labor_force_trends() -> None:
+def plot_labor_force_trends(labor_force_data: pd.DataFrame) -> None:
     """繪製勞動力變動圖"""
     time_periods: pd.Series = labor_force_data["統計期"]
     labor_participation_rate: pd.Series = labor_force_data["勞動力參與率[%]"].astype(float)
@@ -158,11 +158,11 @@ def plot_labor_force_trends() -> None:
     plt.tight_layout()
     plt.show()
 
-plot_labor_force_trends()
+plot_labor_force_trends(labor_force_data)
 
 
 # 圖三：全產業可支配所得變化趨勢圖
-def plot_industry_income_trends() -> None:
+def plot_industry_income_trends(income_data: pd.DataFrame) -> None:
     """繪製全產業可支配所得變化趨勢圖"""
     # FIXME
     def thousands_formatter(x, pos):
@@ -207,7 +207,7 @@ def plot_industry_income_trends() -> None:
     plt.subplots_adjust(left=0.08, right=0.85, top=0.95, bottom=0.1)
     plt.show()
 
-plot_industry_income_trends()
+plot_industry_income_trends(income_data)
 
 # # 圖四：產業別所得差距（箱型圖或長條圖）
 # # FIXME
@@ -276,7 +276,7 @@ plot_industry_income_trends()
 
 # 圖五：青年就業比例 vs 整體失業率
 # 雙軸折線圖（使用年平均失業率，與高中職畢業生就業比例比較）
-def plot_graduates_employment_vs_unemployment() -> None:
+def plot_graduates_employment_vs_unemployment(graduates_data, labor_force_data: pd.DataFrame) -> None:
     """繪製青年就業比例 vs 整體失業率雙軸圖"""
     
     total_graduates: pd.Series = graduates_data["總計[人]"]
@@ -299,7 +299,7 @@ def plot_graduates_employment_vs_unemployment() -> None:
     # 畫雙軸圖
     ax1 = plt.gca()
     ax1.plot(merged["year"], merged["失業率[%]"], label="整體失業率（年平均）", marker="o", color="red")
-    ax1.set_xlabel("年")
+    ax1.set_xlabel("民國年")
     ax1.set_ylabel("失業率 (%)", color="red")
     ax1.set_ylim(merged["失業率[%]"].min() - 0.5, merged["失業率[%]"].max() + 0.5)
     ax1.tick_params(axis="y", labelcolor="red")
@@ -321,4 +321,7 @@ def plot_graduates_employment_vs_unemployment() -> None:
     plt.tight_layout()
     plt.show()
 
-plot_graduates_employment_vs_unemployment()
+plot_graduates_employment_vs_unemployment(
+    graduates_data, 
+    labor_force_data
+)
