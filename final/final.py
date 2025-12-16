@@ -319,4 +319,6 @@ plot5_graduates_employment_vs_unemployment(
     labor_force_data
 )
 
-# 圖六：升學比例 vs 平均所得
+# 圖六：各產業高中職以下學歷比率 vs 受僱人員報酬
+def plot6_education_level_vs_income(income_data: pd.DataFrame) -> None:
+    employee_under_high_school = labor_force_data
