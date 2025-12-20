@@ -49,6 +49,7 @@ def prepare_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         lambda x: int(x.replace("學年", ""))
     )
     graduates_data_full.sort_values(by="學年度", inplace=True)
+    graduates_data_full.fillna(0, inplace=True)
     print(f"""臺北市中等學校畢業生出路(全)
     {graduates_data_full}
     """)
@@ -338,7 +339,7 @@ def plot6_graduates_employment_industry_trends(graduates_data: pd.DataFrame) -> 
         graduates_data["就業/水電燃氣業[人]"] + 
         graduates_data["就業/用水電力燃氣供應及污染整治業[人]"]
     )
-    批發零售及餐飲業及金融保險不動產及租賃業: pd.Series = (
+    批發零售及餐飲業及金融保險不動產及租賃住宿業: pd.Series = (
         graduates_data["就業/批發零售及餐飲業[人]"] +
         graduates_data["就業/批發及零售業[人]"] +
         graduates_data["就業/金融保險不動產及租賃業[人]"] +
@@ -364,7 +365,7 @@ def plot6_graduates_employment_industry_trends(graduates_data: pd.DataFrame) -> 
     plt.plot(academic_years, 礦業及土石採取業 / total_employed * 100, label="礦業及土石採取業", marker="^")
     plt.plot(academic_years, 製造業或營造業 / total_employed * 100, label="製造業或營造業", marker="s")
     plt.plot(academic_years, 水電燃氣業 / total_employed * 100, label="水電燃氣業", marker="D")
-    plt.plot(academic_years, 批發零售及餐飲業及金融保險不動產及租賃業 / total_employed * 100, label="批發零售及餐飲業及金融保險不動產及租賃業", marker="v")
+    plt.plot(academic_years, 批發零售及餐飲業及金融保險不動產及租賃住宿業 / total_employed * 100, label="批發零售及餐飲業及金融保險不動產及租賃業", marker="v")
     plt.plot(academic_years, 運輸倉儲出版影音通信業 / total_employed * 100, label="運輸倉儲出版影音通信業", marker="*")
     plt.plot(academic_years, 其它服務業 / total_employed * 100, label="其它服務業", marker="X")
     plt.plot(academic_years, 其它 / total_employed * 100, label="其它", marker="<")
