@@ -1,7 +1,6 @@
 import matplotlib
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 import numpy as np
 import pandas as pd
 
@@ -33,7 +32,7 @@ def prepare_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         | (graduates_data_1["學制別"] == "高級中學")
         | (graduates_data_1["學制別"] == "高級職業學校")
     ]
-    graduates_data_1_only_senior_high.drop(columns=["學制別"], inplace=True)
+    graduates_data_1_only_senior_high = graduates_data_1_only_senior_high.drop(columns=["學制別"])
     graduates_data_1_only_senior_high = (
         graduates_data_1_only_senior_high.groupby("統計期")
         .sum(numeric_only=True)
@@ -319,6 +318,61 @@ plot5_graduates_employment_vs_unemployment(
     labor_force_data
 )
 
-# 圖六：各產業高中職以下學歷比率 vs 受僱人員報酬
-def plot6_education_level_vs_income(income_data: pd.DataFrame) -> None:
-    employee_under_high_school = labor_force_data
+# 圖六：高中職畢業生就業產業別占比變化趨勢圖
+def plot6_graduates_employment_industry_trends(graduates_data: pd.DataFrame) -> None:
+    """繪製高中職畢業生就業產業別占比變化趨勢圖"""
+    
+    academic_years: pd.Series = graduates_data["學年度"]
+    total_employed: pd.Series = graduates_data["就業/合計[人]"]
+    
+    農林漁牧業: pd.Series = (
+        graduates_data["就業/農林漁牧狩獵業[人]"] +
+        graduates_data["就業/農林漁牧業[人]"]
+    )
+    礦業及土石採取業: pd.Series = graduates_data["就業/礦業及土石採取業[人]"]
+    製造業或營造業: pd.Series = (
+        graduates_data["就業/製造業或營造業[人]"] +
+        graduates_data["就業/製造業營建工程業[人]"]
+    )
+    水電燃氣業: pd.Series = (
+        graduates_data["就業/水電燃氣業[人]"] + 
+        graduates_data["就業/用水電力燃氣供應及污染整治業[人]"]
+    )
+    批發零售及餐飲業及金融保險不動產及租賃業: pd.Series = (
+        graduates_data["就業/批發零售及餐飲業[人]"] +
+        graduates_data["就業/批發及零售業[人]"] +
+        graduates_data["就業/金融保險不動產及租賃業[人]"] +
+        graduates_data["就業/金融保險及不動產業[人]"]+
+        graduates_data["就業/住宿及餐飲業[人]"]
+    )
+    運輸倉儲出版影音通信業: pd.Series = (
+        graduates_data["就業/運輸倉儲通信業[人]"] +
+        graduates_data["就業/運輸倉儲出版影音及資通訊業[人]"]
+    )
+    其它服務業: pd.Series = (
+        graduates_data["就業/社會及個人服務業[人]"] + 
+        graduates_data["就業/專業科學及技術服務業[人]"] +
+        graduates_data["就業/藝術娛樂及休閒服務業[人]"]
+    )
+    其它: pd.Series = (
+        graduates_data["就業/其他[人]"] +
+        graduates_data["就業/公共行政及國防[人]"]
+    )
+    
+    plt.figure(figsize=(12, 6))
+    plt.plot(academic_years, 農林漁牧業 / total_employed * 100, label="農林漁牧業", marker="o")
+    plt.plot(academic_years, 礦業及土石採取業 / total_employed * 100, label="礦業及土石採取業", marker="^")
+    plt.plot(academic_years, 製造業或營造業 / total_employed * 100, label="製造業或營造業", marker="s")
+    plt.plot(academic_years, 水電燃氣業 / total_employed * 100, label="水電燃氣業", marker="D")
+    plt.plot(academic_years, 批發零售及餐飲業及金融保險不動產及租賃業 / total_employed * 100, label="批發零售及餐飲業及金融保險不動產及租賃業", marker="v")
+    plt.plot(academic_years, 運輸倉儲出版影音通信業 / total_employed * 100, label="運輸倉儲出版影音通信業", marker="*")
+    plt.plot(academic_years, 其它服務業 / total_employed * 100, label="其它服務業", marker="X")
+    plt.plot(academic_years, 其它 / total_employed * 100, label="其它", marker="<")
+    plt.xlabel("學年度")
+    plt.xticks(range(min(academic_years), max(academic_years) + 1, 2), rotation=45)
+    plt.ylabel("百分比(%)")
+    plt.title("臺北市高中職畢業生就業產業別占比變化趨勢圖")
+    plt.legend()
+    plt.show()
+
+plot6_graduates_employment_industry_trends(graduates_data)
