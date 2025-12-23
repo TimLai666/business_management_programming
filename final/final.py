@@ -3,6 +3,8 @@ import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import requests
+import io
 
 fm.fontManager.addfont("TaipeiSansTCBeta-Regular.ttf")
 matplotlib.rc("font", family="Taipei Sans TC Beta")
@@ -11,16 +13,24 @@ def prepare_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """準備並清理資料"""
       
     # 讀取中學畢業生出路資料
+    res: requests.Response = requests.get(
+        url="https://tsis.dbas.gov.taipei/statis/webMain.aspx?sys=220&ymf=5700&kind=21&type=0&funid=a05009501&cycle=4&outmode=12&compmode=0&outkind=3&deflst=2&nzo=1", 
+        verify=False
+    )
     graduates_data_1: pd.DataFrame = pd.read_csv(
-        "臺北市中等學校畢業生出路(57學年度至102學年度)時間數列統計資料.csv",
+        io.StringIO(res.content.decode("utf-8")),
         encoding="utf-8",
     )
     print(f"""臺北市中等學校畢業生出路(57學年度至102學年度)
     {graduates_data_1.head()}
     """)
 
+    res: requests.Response = requests.get(
+        url="https://tsis.dbas.gov.taipei/statis/webMain.aspx?sys=220&ymf=5700&kind=21&type=0&funid=a05009503&cycle=4&outmode=12&compmode=0&outkind=3&deflst=2&nzo=1", 
+        verify=False
+    )
     graduates_data_2: pd.DataFrame = pd.read_csv(
-        "臺北市中等學校畢業生出路(103學年度以後).csv",
+        io.StringIO(res.content.decode("utf-8")),
         encoding="utf-8",
     )
     print(f"""臺北市中等學校畢業生出路(103學年度以後)
@@ -55,8 +65,12 @@ def prepare_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """)
     
     # 讀取每人所得資料
+    res: requests.Response = requests.get(
+        url="https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=90194984-ed88-492e-bf24-9c47778239cf", 
+        verify=False
+    )
     income_data: pd.DataFrame = pd.read_csv(
-        "臺北市所得收入者每人所得－行業別按年別.csv", encoding="big5"
+        io.StringIO(res.content.decode("big5")), encoding="big5"
     )
     income_data.replace("-", np.nan, inplace=True)
     income_data.dropna(subset=["[三]可支配所得[NT]"], inplace=True)
@@ -80,8 +94,12 @@ def prepare_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """)
     
     # 讀取勞動力資料
+    res: requests.Response = requests.get(
+        url="https://tsis.dbas.gov.taipei/statis/webMain.aspx?sys=220&ymf=9400&kind=21&type=0&funid=a04000901&cycle=3&outmode=12&compmode=0&outkind=1&deflst=2&nzo=1", 
+        verify=False
+    )
     labor_force_data: pd.DataFrame = pd.read_csv(
-        "臺北市勞動力及就業按半年別時間數列統計資料.csv", encoding="utf-8"
+        io.StringIO(res.content.decode("utf-8")), encoding="utf-8"
     )
     print(f"""臺北市勞動力及就業按半年別時間數列統計資料
     {labor_force_data.head()}
